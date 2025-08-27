@@ -1,19 +1,22 @@
-import { createBrowserRouter, RouterProvider, Route, Routes } from "react-router-dom"
+import { createBrowserRouter, RouterProvider } from "react-router-dom"
 import { HomePage } from "../pages/HomePage"
+import { GameMode } from "../pages/GameMode"
+import { Layout } from "../components/Layout"
 
 const router = createBrowserRouter(
     [
         {
             path: "/",
-            element: <HomePage />,
-            errorElement: <div>404</div>
-        },
-        {
-            path: "/dashboard",
-            element: <div>hola despues de play</div>,
+            element: <Layout />,
+            errorElement: <div>404</div>,
             children: [
                 {
-                    element: <div>hola despues de play</div>
+                    index: true,
+                    element: <HomePage />
+                },
+                {
+                    path: "game",
+                    element: <GameMode />
                 }
             ]
         },
