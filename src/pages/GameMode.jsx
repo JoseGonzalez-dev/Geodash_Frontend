@@ -1,9 +1,12 @@
 import React, { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { AuthModal } from '../components/molecules/AuthModal'
 
 export const GameMode = () => {
     const navigate = useNavigate()
     const [isLoaded, setIsLoaded] = useState(false)
+    const [showAuthModal, setShowAuthModal] = useState(false)
+    const [isAuthenticated, setIsAuthenticated] = useState(false) // Simular estado de autenticación
 
     const gameCards = [
         {
@@ -39,6 +42,29 @@ export const GameMode = () => {
         }, 100)
         return () => clearTimeout(timer)
     }, [])
+
+    const handleStartGame = (gameId) => {
+        if (!isAuthenticated) {
+            setShowAuthModal(true)
+        } else {
+            // Lógica para iniciar el juego
+            console.log(`Iniciando juego: ${gameId}`)
+        }
+    }
+
+    const handleLogin = () => {
+        // Aquí iría la lógica de login
+        console.log('Redirigir a login')
+        setShowAuthModal(false)
+        // navigate('/login')
+    }
+
+    const handleRegister = () => {
+        // Aquí iría la lógica de registro
+        console.log('Redirigir a registro')
+        setShowAuthModal(false)
+        // navigate('/register')
+    }
 
     return (
         <div className="min-h-screen flex flex-col items-center justify-center text-white p-8 relative overflow-hidden">
@@ -79,8 +105,11 @@ export const GameMode = () => {
                             </div>
 
                             {/* Botón Empezar abajo */}
-                            <button className={`${card.buttonColor} text-black hover:text-white px-6 py-3 rounded-lg text-lg font-semibold transition-all duration-300 hover:scale-105 shadow-lg transform ${isLoaded ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'
-                                } ${card.delay}`}>
+                            <button 
+                                onClick={() => handleStartGame(card.id)}
+                                className={`${card.buttonColor} text-black hover:text-white px-6 py-3 rounded-lg text-lg font-semibold transition-all duration-300 hover:scale-105 shadow-lg transform ${isLoaded ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'
+                                } ${card.delay}`}
+                            >
                                 Empezar
                             </button>
                         </div>
@@ -91,20 +120,46 @@ export const GameMode = () => {
             {/* Streak indicator */}
             <div className={`absolute bottom-20 left-1/2 transform -translate-x-1/2 transition-all duration-1200 delay-800 ${isLoaded ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'
                 }`}>
-                <div className="bg-gray-800/90 backdrop-blur-sm rounded-xl px-6 py-4 border border-gray-600/50 hover:border-orange-400/50 transition-all duration-300">
-                    <div className="flex items-center space-x-3">
-                        <span className="text-2xl animate-bounce">🔥</span>
-                        <span className="text-white font-semibold">Estas en racha!</span>
+                {isAuthenticated ? (
+                    <div className="bg-gray-800/90 backdrop-blur-sm rounded-xl px-6 py-4 border border-gray-600/50 hover:border-orange-400/50 transition-all duration-300">
+                        <div className="flex items-center space-x-3">
+                            <span className="text-2xl animate-bounce">🔥</span>
+                            <span className="text-white font-semibold">¡Estás en racha!</span>
+                        </div>
+                        {/* Progress bar */}
+                        <div className="w-48 h-2 bg-gray-600 rounded-full mt-2 overflow-hidden">
+                            <div className={`h-full bg-gradient-to-r from-orange-400 to-red-500 rounded-full transition-all duration-2000 delay-1000 ${isLoaded ? 'w-1/3' : 'w-0'
+                                }`}></div>
+                        </div>
                     </div>
-                    {/* Progress bar */}
-                    <div className="w-48 h-2 bg-gray-600 rounded-full mt-2 overflow-hidden">
-                        <div className={`h-full bg-gradient-to-r from-orange-400 to-red-500 rounded-full transition-all duration-2000 delay-1000 ${isLoaded ? 'w-1/3' : 'w-0'
-                            }`}></div>
-                    </div>
-                </div>
+                ) : (
+                    <button
+                        onClick={() => setShowAuthModal(true)}
+                        className="bg-gradient-to-r from-orange-500/20 to-red-500/20 backdrop-blur-sm rounded-xl px-8 py-4 border-2 border-orange-400/50 hover:border-orange-400 transition-all duration-300 hover:scale-105 group"
+                    >
+                        <div className="flex items-center space-x-3">
+                            <span className="text-3xl animate-pulse">🔥</span>
+                            <div className="text-left">
+                                <div className="text-orange-400 font-bold text-lg group-hover:text-orange-300">
+                                    ¡Inicia tu racha!
+                                </div>
+                                <div className="text-gray-300 text-sm group-hover:text-white">
+                                    Regístrate para competir globalmente
+                                </div>
+                            </div>
+                            <span className="text-orange-400 group-hover:text-orange-300 animate-bounce">→</span>
+                        </div>
+                    </button>
+                )}
             </div>
 
-
+            {/* Modal de autenticación */}
+            <AuthModal
+                isOpen={showAuthModal}
+                onClose={() => setShowAuthModal(false)}
+                onLogin={handleLogin}
+                onRegister={handleRegister}
+            />
         </div>
     )
 }

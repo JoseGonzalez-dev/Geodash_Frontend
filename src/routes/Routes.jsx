@@ -7,17 +7,22 @@ const router = createBrowserRouter(
     [
         {
             path: "/",
+            element: <HomePage />
+
+        },
+        {
+            path: "/game",
             element: <Layout />,
             errorElement: <div>404</div>,
             children: [
                 {
                     index: true,
-                    element: <HomePage />
-                },
-                {
-                    path: "game",
                     element: <GameMode />
-                }
+                },
+                // {
+                //     path: ':mode',
+                //     element: <GameMode />
+                // }
             ]
         },
         {
