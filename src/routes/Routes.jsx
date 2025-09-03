@@ -2,13 +2,16 @@ import { createBrowserRouter, RouterProvider } from "react-router-dom"
 import { HomePage } from "../pages/HomePage"
 import { GameMode } from "../pages/GameMode"
 import { Layout } from "../components/Layout"
-
+import NivelFacil from "../components/Levels/NivelFacil"
+import NivelMedio from "../components/Levels/NivelMedio"
+import NivelDificil from "../components/Levels/NivelDificil"
+ 
 const router = createBrowserRouter(
     [
         {
             path: "/",
             element: <HomePage />
-
+ 
         },
         {
             path: "/game",
@@ -19,10 +22,19 @@ const router = createBrowserRouter(
                     index: true,
                     element: <GameMode />
                 },
-                // {
-                //     path: ':mode',
-                //     element: <GameMode />
-                // }
+                {
+                    path: "facil",
+                    element: <NivelFacil />
+                },
+                {
+                    path: "medio",
+                    element: <NivelMedio/>
+
+                },
+                {
+                    path: "dificil",
+                    element: <NivelDificil/>
+                }
             ]
         },
         {
@@ -31,7 +43,7 @@ const router = createBrowserRouter(
         }
     ]
 )
-
+ 
 export const MyRouter = () => {
     return (
         <RouterProvider router={router} />
