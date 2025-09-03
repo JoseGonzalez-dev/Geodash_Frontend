@@ -1,6 +1,5 @@
 import React, { useState } from 'react'
-import { validarRespuesta } from '../api'
-
+import { validarRespuesta } from '../../services/Questionsapi.js'
 const PreguntaCard = ({ pregunta }) => {
   const [seleccion, setSeleccion] = useState('')
   const [resultado, setResultado] = useState(null)
