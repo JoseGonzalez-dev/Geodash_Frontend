@@ -1,6 +1,6 @@
 import { useState } from "react"
 import { useNavigate } from "react-router-dom"
-import { loginRequest } from "../../../src/services/Authapi.js"
+import { loginRequest } from "../../../services/Authapi.js"
 import toast from "react-hot-toast"
 
 

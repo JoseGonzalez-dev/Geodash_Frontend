@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { validateEmailOrUsername, validatePassword } from "../../../shared/validators/validators.js"
+import { validateEmailOrUsername, validatePassword } from "../../../../shared/validators/validators.js"
 import { useLogin } from "../../../shared/hooks/Auth/useLogin.jsx"
 import { Input } from "../../components/Input.jsx"
 

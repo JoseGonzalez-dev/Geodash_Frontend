@@ -7,7 +7,7 @@ import {  emailValidationMessage, nameValidationMessage, passConfirmValidationMe
     validatePassConfirm, 
     validatePassword, 
     validateSurname,
-    validateUsername} from '../../../shared/validators/validators'
+    validateUsername} from '../../../../shared/validators/validators'
 import { useRegister } from '../../../shared/hooks/Auth/useRegister'
 import { useUser } from '../../../shared/hooks/User/useUser'
 
