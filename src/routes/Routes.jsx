@@ -2,6 +2,8 @@ import { createBrowserRouter, RouterProvider } from "react-router-dom"
 import { HomePage } from "../pages/HomePage"
 import { GameMode } from "../pages/GameMode"
 import { Layout } from "../components/Layout"
+import { Login } from "../components/Auth/Login"
+import { Register } from "../components/Auth/Register"
  
 const router = createBrowserRouter(
     [
@@ -24,6 +26,16 @@ const router = createBrowserRouter(
         {
             path: '/*',
             element: <div>404</div>
+        },
+        {
+            path: "/login",
+            element: <Login />
+ 
+        },
+        {
+            path: "/register",
+            element: <Register />
+ 
         }
     ]
 )

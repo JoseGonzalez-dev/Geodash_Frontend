@@ -7,9 +7,10 @@ import {  emailValidationMessage, nameValidationMessage, passConfirmValidationMe
     validatePassConfirm, 
     validatePassword, 
     validateSurname,
-    validateUsername} from '../../../../shared/validators/validators'
-import { useRegister } from '../../../shared/hooks/Auth/useRegister'
-import { useUser } from '../../../shared/hooks/User/useUser'
+    validateUsername} from '../../shared/validators/validators'
+import { useRegister } from '../../shared/hooks/Auth/useRegister'
+import { useUser } from '../../shared/hooks/User/useUser'
+import { StarsBackground } from '../molecules/StarsBackground'
 
 export const Register = ({ switchAuthHandler }) => {
     const form = {
@@ -117,9 +118,10 @@ export const Register = ({ switchAuthHandler }) => {
 
     return (
             <div className="w-full flex items-center justify-center bg-blue-800">
-                <div className="max-w-md w-full py-12 rounded-md">
+                <StarsBackground mode="space" />
+                <div className="max-w-md w-full py-12 rounded-md z-10">
                     <div className="text-center mb-6">
-                        <h2 className="text-4xl font-bold text-green-400 mb-4">Register</h2>
+                        <h1 className="text-3xl text-center font-bold bg-gradient-to-r from-blue-400 via-cyan-500 to-green-400 bg-clip-text text-transparent drop-shadow-lg">Register</h1>
                     </div>
 
                     <form onSubmit={handleSubmit} className="space-y-4 flex flex-col">
@@ -139,7 +141,7 @@ export const Register = ({ switchAuthHandler }) => {
                         </div>
                         <div className="flex gap-4 mb-4">
                             <div className='flex flex-col'>
-                                <label className="text-xl font-bold text-white text-center mb-10 ">Name</label>
+                                <label className="text-xl font-bold text-white text-center mb-4">Name</label>
                             <Input
                                 field='name'
                                 value={formData.name.value}
@@ -152,7 +154,7 @@ export const Register = ({ switchAuthHandler }) => {
                             />
                             </div>
                             <div className='flex flex-col'>
-                              <label className="text-xl font-bold text-white text-center mb-10">Surname</label>
+                              <label className="text-xl font-bold text-white text-center mb-4">Surname</label>
                             <Input
                                 field='surname'
                                 value={formData.surname.value}
@@ -208,25 +210,20 @@ export const Register = ({ switchAuthHandler }) => {
                         <button
                             type="submit"
                             disabled={isSubmitButtonDisable}
-                            className={`w-full py-2 rounded-md text-white transition ${
+                            className={`w-full py-2 rounded-md text-white font-bold transition ${
                                 isSubmitButtonDisable
-                                    ? 'bg-blue-300 cursor-not-allowed'
-                                    : 'bg-blue-600 hover:bg-blue-700'
+                                    ? 'bg-blue-800 cursor-not-allowed'
+                                    : 'bg-blue-700 hover:bg-green-800 text-white font-bold'
                             }`}
                         >
-                            Enviar
+                            Registrar
+                        </button>
+                        <button className="w-full bg-blue-800 hover:bg-green-800 text-white font-bold py-2 px-4 mb-6 rounded">
+                            Iniciar Sesión
                         </button>
                     </form>
 
-                    <p className="text-center text-sm mt-6 text-gray-600">
-                        ¿Ya tienes una cuenta?{" "}
-                        <span
-                            onClick={switchAuthHandler}
-                            className="text-blue-600 hover:underline cursor-pointer"
-                        >
-                            ¡Inicia sesión acá!
-                        </span>
-                    </p>
+                    
                 </div>
             </div>
     )

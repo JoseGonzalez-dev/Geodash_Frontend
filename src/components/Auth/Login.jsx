@@ -1,7 +1,8 @@
 import React, { useState } from "react";
-import { validateEmailOrUsername, validatePassword } from "../../../../shared/validators/validators.js"
-import { useLogin } from "../../../shared/hooks/Auth/useLogin.jsx"
+import { validateEmailOrUsername, validatePassword } from "../../shared/validators/validators.js"
+import { useLogin } from "../../shared/hooks/Auth/useLogin.jsx"
 import { Input } from "../../components/Input.jsx"
+import { StarsBackground } from "../molecules/StarsBackground.jsx";
 
 export const Login = ({ switchAuthHandler }) => {
     const { login } = useLogin();
@@ -43,9 +44,10 @@ export const Login = ({ switchAuthHandler }) => {
     };
 
     return (
-        <div className="flex items-center justify-center min-h-screen bg-blue-900">
-            <div className="p-8 bg-blue-600 rounded-lg shadow-xl w-full max-w-md">
-                 <h1 className="text-4xl font-bold text-green-400 text-center mb-10">Login</h1>
+        <div className="flex items-center justify-center min-h-screen" >
+            <StarsBackground mode="space" />
+            <div className=" p-8 rounded-lg w-full max-w-md z-10 ">
+                  <h1 className="text-3xl text-center font-bold bg-gradient-to-r from-blue-400 via-cyan-500 to-green-400 bg-clip-text text-transparent drop-shadow-lg">Login</h1>
                     <div className="text-center mb-6">
                     </div>
                     <form onSubmit={handleLogin} className="space-y-4">
@@ -76,7 +78,7 @@ export const Login = ({ switchAuthHandler }) => {
 
                         <button
                             disabled={isSubmitButtonDisable}
-                            className={`w-full py-2 rounded-md text-white transition ${
+                            className={`w-full py-2 rounded-md text-white font-bold transition ${
                                 isSubmitButtonDisable
                                     ? 'bg-blue-800 cursor-not-allowed'
                                     : 'bg-blue-700 hover:bg-green-800 text-white font-bold'
