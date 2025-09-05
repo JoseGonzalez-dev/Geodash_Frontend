@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react"
 import { getPreguntasConOpciones } from "../../services/Questionsapi"
+import PreguntaCard from "../Card/QuestionCard"
 
 const NivelMedio = () => {
   const [preguntas, setPreguntas] = useState([])
@@ -7,9 +8,26 @@ const NivelMedio = () => {
 
   useEffect(() => {
     const fetchPreguntas = async () => {
-      const res = await getPreguntasConOpciones()
-      if (res.success) {
-        setPreguntas(res.preguntas.filter(p => p.dificultad === "Medio"))
+      try {
+        console.log('✈️ Fetching preguntas para nivel Medio...')
+        const res = await getPreguntasConOpciones()
+        console.log('📦 Respuesta completa de la API:', res)
+        
+        if (res.success) {
+          const todasLasPreguntas = res.preguntas
+          console.log('📝 Todas las preguntas:', todasLasPreguntas)
+          console.log('🎯 Dificultades disponibles:', [...new Set(todasLasPreguntas.map(p => p.dificultad))])
+          
+          const preguntasMedio = todasLasPreguntas.filter(p => p.dificultad === "Medio")
+          console.log('✅ Preguntas medio encontradas:', preguntasMedio.length)
+          console.log('✈️ Primera pregunta medio:', preguntasMedio[0])
+          
+          setPreguntas(preguntasMedio)
+        } else {
+          console.error('❌ API response not successful:', res)
+        }
+      } catch (error) {
+        console.error('💥 Error fetching preguntas:', error)
       }
     }
     fetchPreguntas()
@@ -21,43 +39,59 @@ const NivelMedio = () => {
     }
   }
 
-  if (preguntas.length === 0) return <p>Cargando preguntas...</p>
+  if (preguntas.length === 0) {
+    return (
+      <div className="relative flex h-screen w-full items-center justify-center bg-gradient-to-b from-sky-300 to-pink-200">
+        <div className="text-center">
+          <div className="text-6xl mb-4 animate-spin">✈️</div>
+          <p className="text-xl text-gray-700">Cargando preguntas nivel Medio...</p>
+          <p className="text-sm text-gray-500 mt-2">Revisa la consola para más detalles</p>
+        </div>
+      </div>
+    )
+  }
 
   const pregunta = preguntas[currentIndex]
   const progreso = ((currentIndex + 1) / preguntas.length) * 100
 
   return (
-    <div className="relative flex h-screen w-full items-center justify-center bg-gradient-to-b from-sky-300 to-pink-200">
-      <div className="relative w-[600px] rounded-2xl bg-white/70 p-6 shadow-xl backdrop-blur-md">
+    <div className="relative flex min-h-screen w-full items-center justify-center bg-gradient-to-b from-sky-300 to-pink-200 p-4 md:p-6 lg:p-8">
+      <div className="relative w-full max-w-5xl mx-auto rounded-2xl bg-white/80 p-6 md:p-8 lg:p-12 shadow-xl backdrop-blur-md">
         {/* Barra de progreso */}
-        <div className="mb-4">
-          <div className="h-2 w-full rounded bg-gray-200">
+        <div className="mb-6">
+          <div className="h-3 w-full rounded bg-gray-200">
             <div
-              className="h-2 rounded bg-blue-500 transition-all"
+              className="h-3 rounded bg-blue-500 transition-all"
               style={{ width: `${progreso}%` }}
             ></div>
           </div>
-          <p className="mt-1 text-sm text-gray-600">
+          <p className="mt-2 text-lg text-gray-600 text-center font-medium">
             Pregunta {currentIndex + 1}/{preguntas.length}
           </p>
         </div>
 
-        {/* Pregunta */}
-        <h3 className="mb-6 text-center text-lg font-semibold text-gray-800">
-          {pregunta.texto}
-        </h3>
+        {/* Componente de Pregunta */}
+        <PreguntaCard 
+          key={currentIndex}
+          pregunta={pregunta} 
+          onAnswered={() => {
+            setTimeout(() => {
+              if (currentIndex < preguntas.length - 1) {
+                handleNext()
+              }
+            }, 2000)
+          }}
+        />
 
-        {/* Opciones */}
-        <div className="grid grid-cols-2 gap-4">
-          {pregunta.opciones.map((opcion, i) => (
-            <button
-              key={i}
-              onClick={handleNext}
-              className="rounded-lg bg-sky-100 py-3 text-lg font-medium text-gray-800 shadow hover:bg-sky-200"
-            >
-              {opcion.texto}
-            </button>
-          ))}
+        {/* Botón de siguiente (opcional) */}
+        <div className="mt-8 text-center">
+          <button
+            onClick={handleNext}
+            disabled={currentIndex >= preguntas.length - 1}
+            className="rounded-xl bg-blue-500 px-8 md:px-12 py-3 md:py-4 text-lg md:text-xl text-white font-bold shadow-lg hover:bg-blue-600 hover:scale-105 disabled:bg-gray-400 disabled:cursor-not-allowed disabled:hover:scale-100 transition-all duration-300"
+          >
+            {currentIndex >= preguntas.length - 1 ? '🎉 Completado' : '➡️ Siguiente'}
+          </button>
         </div>
       </div>
     </div>

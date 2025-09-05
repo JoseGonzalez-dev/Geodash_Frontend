@@ -6,7 +6,7 @@ export const GameMode = () => {
     const navigate = useNavigate()
     const [isLoaded, setIsLoaded] = useState(false)
     const [showAuthModal, setShowAuthModal] = useState(false)
-    const [isAuthenticated, setIsAuthenticated] = useState(false) // Simular estado de autenticación
+    const [isAuthenticated, setIsAuthenticated] = useState(true) // Simular estado de autenticación
 
     const gameCards = [
         {
@@ -47,8 +47,18 @@ export const GameMode = () => {
         if (!isAuthenticated) {
             setShowAuthModal(true)
         } else {
-            // Lógica para iniciar el juego
-            console.log(`Iniciando juego: ${gameId}`)
+            // Mapear cada card a su nivel correspondiente
+            const routeMap = {
+                'explorer': '/game/facil',     // 🔍 Explorador -> Fácil
+                'traveler': '/game/medio',     // ✈️ Viajero -> Medio  
+                'geographer': '/game/dificil'  // 🏆 Geógrafo -> Difícil
+            }
+
+            const route = routeMap[gameId]
+            if (route) {
+                console.log(`Navegando a: ${route}`)
+                navigate(route)
+            }
         }
     }
 
@@ -78,8 +88,8 @@ export const GameMode = () => {
                     <div
                         key={card.id}
                         className={`relative group transform transition-all duration-1000 ease-out ${card.delay} ${isLoaded
-                                ? 'translate-y-0 opacity-100 scale-100'
-                                : 'translate-y-20 opacity-0 scale-95'
+                            ? 'translate-y-0 opacity-100 scale-100'
+                            : 'translate-y-20 opacity-0 scale-95'
                             }`}
                     >
                         {/* Efecto glow */}
@@ -105,10 +115,10 @@ export const GameMode = () => {
                             </div>
 
                             {/* Botón Empezar abajo */}
-                            <button 
+                            <button
                                 onClick={() => handleStartGame(card.id)}
                                 className={`${card.buttonColor} text-black hover:text-white px-6 py-3 rounded-lg text-lg font-semibold transition-all duration-300 hover:scale-105 shadow-lg transform ${isLoaded ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'
-                                } ${card.delay}`}
+                                    } ${card.delay}`}
                             >
                                 Empezar
                             </button>

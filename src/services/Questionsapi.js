@@ -1,12 +1,12 @@
-const API_URL = "http://localhost:5137/api" 
+const API_URL = "https://geodash-backend.onrender.com/api/v1/geobash"
 
 export const getPreguntasConOpciones = async () => {
-  const res = await fetch(`${API_URL}/respuestas/preguntas-con-opciones`)
+  const res = await fetch(`${API_URL}/answers/preguntas-con-opciones`)
   return res.json()
 }
 
 export const validarRespuesta = async (id_pregunta, opcionElegida) => {
-  const res = await fetch(`${API_URL}/respuestas/validar-respuesta`, {
+  const res = await fetch(`${API_URL}/answers/validar-respuesta`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ id_pregunta, opcionElegida })
