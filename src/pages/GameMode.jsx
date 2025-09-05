@@ -6,7 +6,7 @@ export const GameMode = () => {
     const navigate = useNavigate()
     const [isLoaded, setIsLoaded] = useState(false)
     const [showAuthModal, setShowAuthModal] = useState(false)
-    const [isAuthenticated, setIsAuthenticated] = useState(true) // Simular estado de autenticación
+    const [isAuthenticated, setIsAuthenticated] = useState(false) // Cambiar a false para probar auth
 
     const gameCards = [
         {
@@ -36,6 +36,13 @@ export const GameMode = () => {
     ]
 
     useEffect(() => {
+        // Verificar si el usuario está autenticado
+        const token = localStorage.getItem('token')
+        const user = localStorage.getItem('user')
+        if (token && user) {
+            setIsAuthenticated(true)
+        }
+
         // Activar animaciones después de un pequeño delay
         const timer = setTimeout(() => {
             setIsLoaded(true)
@@ -63,17 +70,15 @@ export const GameMode = () => {
     }
 
     const handleLogin = () => {
-        // Aquí iría la lógica de login
-        console.log('Redirigir a login')
+        // Navegar a la página de login existente
+        navigate('/login')
         setShowAuthModal(false)
-        // navigate('/login')
     }
 
     const handleRegister = () => {
-        // Aquí iría la lógica de registro
-        console.log('Redirigir a registro')
+        // Navegar a la página de registro existente
+        navigate('/register')
         setShowAuthModal(false)
-        // navigate('/register')
     }
 
     return (

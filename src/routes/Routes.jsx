@@ -5,6 +5,8 @@ import { Layout } from "../components/Layout"
 import NivelFacil from "../components/Levels/NivelFacil"
 import NivelMedio from "../components/Levels/NivelMedio"
 import NivelDificil from "../components/Levels/NivelDificil"
+import { Login } from "../components/Auth/Login"
+import { Register } from "../components/Auth/Register"
  
 const router = createBrowserRouter(
     [
@@ -40,6 +42,16 @@ const router = createBrowserRouter(
         {
             path: '/*',
             element: <div>404</div>
+        },
+        {
+            path: "/login",
+            element: <Login />
+ 
+        },
+        {
+            path: "/register",
+            element: <Register />
+ 
         }
     ]
 )
