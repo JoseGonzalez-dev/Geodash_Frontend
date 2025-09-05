@@ -1,0 +1,47 @@
+import { useState } from "react"
+import { registerRequest } from "../../../services/Authapi.js"
+import toast from "react-hot-toast"
+import { useNavigate } from "react-router-dom"
+
+
+export const useRegister=()=>{
+    const [isLoading,setIsLoading]=useState(false)
+    const [error,setError]=useState(false)
+    const navigate=useNavigate()
+
+    const register=async(user)=>{
+        setIsLoading(true)
+        
+        console.log('🚀 Iniciando petición de registro:', user)
+        console.log('📡 URL de la API:', `${import.meta.env.VITE_API_BACKEND}/auth/register`)
+        
+        const response=await registerRequest(user)
+        console.log('📥 Respuesta del registro:', response)
+        setIsLoading(false)
+        console.log(response.e);
+        
+        if(response.error){
+            setError(true)
+            if(response?.e?.response?.data?.errors){
+                const arrayErrors=response?.e?.response?.data?.errors
+                for(const error of arrayErrors){
+                    return  toast.error(error.msg)
+                }
+            }
+            return toast.error(
+                response?.e?.response?.data?.msg ||
+                response?.e?.data?.msg ||
+                'Error al intentar registrarte. Intenta de nuevo'
+            )
+        }
+        setError(false)
+        toast.success('Registro exitoso')
+        navigate('/auth')
+    }
+    return{
+        register,
+        isLoading,
+        error,
+        setError
+    }
+}
