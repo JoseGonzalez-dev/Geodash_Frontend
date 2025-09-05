@@ -1,4 +1,4 @@
-const API_URL = "https://geodash-backend.onrender.com/api/v1/geobash"
+const API_URL = import.meta.env.VITE_API_BACKEND
 
 export const getPreguntasConOpciones = async () => {
   const res = await fetch(`${API_URL}/answers/preguntas-con-opciones`)
