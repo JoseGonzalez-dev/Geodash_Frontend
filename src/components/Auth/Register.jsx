@@ -11,6 +11,7 @@
     import { useRegister } from '../../shared/hooks/Auth/useRegister'
     import { useUser } from '../../shared/hooks/User/useUser'
     import { StarsBackground } from '../molecules/StarsBackground'
+import { Link } from 'react-router-dom'
 
     export const Register = ({ switchAuthHandler }) => {
         const form = {
@@ -124,104 +125,104 @@
                             <h1 className="text-3xl text-center font-bold bg-gradient-to-r from-blue-400 via-cyan-500 to-green-400 bg-clip-text text-transparent drop-shadow-lg">Register</h1>
                         </div>
 
-                        <form onSubmit={handleSubmit} className="space-y-4 flex flex-col">
-                            <div>
-                                <label className="text-xl font-bold text-white text-center mb-10">Email</label>
-                                <Input 
-                                    field='email'
-                                    value={formData.email.value}
-                                    onChangeHandler={handleValueChange}
-                                    placeholder={formData.email.value}
-                                    type='email'
-                                    onBlurHandler={handleValidationOnBlur}
-                                    showErrorMessage={formData.email.showError}
-                                    validationMessage={emailValidationMessage}
-                                    
-                                />
+                    <form onSubmit={handleSubmit} className="space-y-4 flex flex-col">
+                        <div>
+                            <label className="text-xl font-bold text-white text-center mb-10">Email</label>
+                            <Input 
+                                field='email'
+                                value={formData.email.value}
+                                onChangeHandler={handleValueChange}
+                                placeholder={formData.email.value}
+                                type='email'
+                                onBlurHandler={handleValidationOnBlur}
+                                showErrorMessage={formData.email.showError}
+                                validationMessage={emailValidationMessage}
+                                
+                            />
+                        </div>
+                        <div className="flex gap-4 mb-4">
+                            <div className='flex flex-col'>
+                                <label className="text-xl font-bold text-white text-center mb-4">Name</label>
+                            <Input
+                                field='name'
+                                value={formData.name.value}
+                                onChangeHandler={handleValueChange}
+                                placeholder={formData.name.value}
+                                type='text'
+                                onBlurHandler={handleValidationOnBlur}
+                                showErrorMessage={formData.name.showError}
+                                validationMessage={nameValidationMessage}
+                            />
                             </div>
-                            <div className="flex gap-4 mb-4">
-                                <div className='flex flex-col'>
-                                    <label className="text-xl font-bold text-white text-center mb-4">Name</label>
-                                <Input
-                                    field='name'
-                                    value={formData.name.value}
-                                    onChangeHandler={handleValueChange}
-                                    placeholder={formData.name.value}
-                                    type='text'
-                                    onBlurHandler={handleValidationOnBlur}
-                                    showErrorMessage={formData.name.showError}
-                                    validationMessage={nameValidationMessage}
-                                />
-                                </div>
-                                <div className='flex flex-col'>
-                                <label className="text-xl font-bold text-white text-center mb-4">Surname</label>
-                                <Input
-                                    field='surname'
-                                    value={formData.surname.value}
-                                    onChangeHandler={handleValueChange}
-                                    placeholder={formData.surname.value}
-                                    type='text'
-                                    onBlurHandler={handleValidationOnBlur}
-                                    showErrorMessage={formData.surname.showError}
-                                    validationMessage={surnameValidationMessage}
-                                    className="flex-1 p-2 box-border border border-gray-300 rounded"
-                                />   
-                                </div>
+                            <div className='flex flex-col'>
+                              <label className="text-xl font-bold text-white text-center mb-4">Surname</label>
+                            <Input
+                                field='surname'
+                                value={formData.surname.value}
+                                onChangeHandler={handleValueChange}
+                                placeholder={formData.surname.value}
+                                type='text'
+                                onBlurHandler={handleValidationOnBlur}
+                                showErrorMessage={formData.surname.showError}
+                                validationMessage={surnameValidationMessage}
+                                className="flex-1 p-2 box-border border border-gray-300 rounded"
+                            />   
                             </div>
-                            <div>
-                                <label className="text-xl font-bold text-white text-center mb-10">Username</label>
-                                <Input 
-                                    field='username'
-                                    value={formData.username.value}
-                                    onChangeHandler={handleValueChange}
-                                    placeholder={formData.username.value}
-                                    type='username'
-                                    onBlurHandler={handleValidationOnBlur}
-                                    showErrorMessage={formData.username.showError}
-                                    validationMessage={usernameValidationMessage}
-                                    
-                                />
-                            </div>
-                            <div>
-                                <label className="text-xl font-bold text-white text-center mb-10">Password</label>
-                                <Input 
-                                    field='password'
-                                    onChangeHandler={handleValueChange}
-                                    value={formData.password.value} 
-                                    type='password'
-                                    onBlurHandler={handleValidationOnBlur}
-                                    showErrorMessage={formData.password.showError}
-                                    validationMessage={passwordValidationMessage}
-                                />
-                            </div>
-                            <div>
-                                <label className="text-xl font-bold text-white text-center mb-10">Password Confirmation</label>
-                                <Input 
-                                    field='confirmPassword'
-                                    onChangeHandler={handleValueChange}
-                                    value={formData.confirmPassword.value} 
-                                    type='password'
-                                    onBlurHandler={handleValidationOnBlur}
-                                    showErrorMessage={formData.confirmPassword.showError}
-                                    validationMessage={passConfirmValidationMessage}
-                                />
-                            </div>
+                        </div>
+                        <div>
+                            <label className="text-xl font-bold text-white text-center mb-10">Username</label>
+                            <Input 
+                                field='username'
+                                value={formData.username.value}
+                                onChangeHandler={handleValueChange}
+                                placeholder={formData.username.value}
+                                type='username'
+                                onBlurHandler={handleValidationOnBlur}
+                                showErrorMessage={formData.username.showError}
+                                validationMessage={usernameValidationMessage}
+                                
+                            />
+                        </div>
+                        <div>
+                            <label className="text-xl font-bold text-white text-center mb-10">Password</label>
+                            <Input 
+                                field='password'
+                                onChangeHandler={handleValueChange}
+                                value={formData.password.value} 
+                                type='password'
+                                onBlurHandler={handleValidationOnBlur}
+                                showErrorMessage={formData.password.showError}
+                                validationMessage={passwordValidationMessage}
+                            />
+                        </div>
+                        <div>
+                            <label className="text-xl font-bold text-white text-center mb-10">Password Confirmation</label>
+                            <Input 
+                                field='confirmPassword'
+                                onChangeHandler={handleValueChange}
+                                value={formData.confirmPassword.value} 
+                                type='password'
+                                onBlurHandler={handleValidationOnBlur}
+                                showErrorMessage={formData.confirmPassword.showError}
+                                validationMessage={passConfirmValidationMessage}
+                            />
+                        </div>
 
-                            <button
-                                type="submit"
-                                disabled={isSubmitButtonDisable}
-                                className={`w-full py-2 rounded-md text-white font-bold transition ${
-                                    isSubmitButtonDisable
-                                        ? 'bg-blue-800 cursor-not-allowed'
-                                        : 'bg-blue-700 hover:bg-green-800 text-white font-bold'
-                                }`}
-                            >
-                                Registrar
-                            </button>
-                            <button className="w-full bg-blue-800 hover:bg-green-800 text-white font-bold py-2 px-4 mb-6 rounded">
-                                Iniciar Sesión
-                            </button>
-                        </form>
+                        <button
+                            type="submit"
+                            disabled={isSubmitButtonDisable}
+                            className={`w-full py-2 rounded-md text-white font-bold transition ${
+                                isSubmitButtonDisable
+                                    ? 'bg-blue-800 cursor-not-allowed'
+                                    : 'bg-blue-700 hover:bg-green-800 text-white font-bold'
+                            }`}
+                        >
+                            Registrar
+                        </button>
+                        <button className="w-full bg-blue-800 hover:bg-green-800 text-white font-bold py-2 px-4 mb-6 rounded">
+                            Iniciar Sesión
+                        </button>
+                    </form>
 
                         
                     </div>
