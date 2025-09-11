@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import { validarRespuesta } from '../../services/Questionsapi.js'
 
-const PreguntaCard = ({ pregunta, onAnswered }) => {
+const PreguntaCard = ({ pregunta, onAnswered, disabled = false }) => {
   const [seleccion, setSeleccion] = useState('')
   const [mostrarResultados, setMostrarResultados] = useState(false)
   const [respuestaCorrecta, setRespuestaCorrecta] = useState('')
@@ -27,7 +27,7 @@ const PreguntaCard = ({ pregunta, onAnswered }) => {
   }
 
   const handleSeleccion = async (opcionTexto) => {
-    if (mostrarResultados || cargando) return
+    if (mostrarResultados || cargando || disabled) return
 
     setSeleccion(opcionTexto)
     setCargando(true)
@@ -64,7 +64,7 @@ const PreguntaCard = ({ pregunta, onAnswered }) => {
       setMostrarResultados(true)
 
       if (onAnswered) {
-        onAnswered(res.correcta)
+        onAnswered(res.correcta, opcionTexto)
       }
     } catch (error) {
       console.error('Error validando respuesta:', error)
@@ -148,7 +148,7 @@ const PreguntaCard = ({ pregunta, onAnswered }) => {
               style={getButtonStyle(opcionTexto)}
               className="p-4 md:p-6 lg:p-8 rounded-xl text-base md:text-lg lg:text-xl font-bold transition-all duration-300 hover:scale-105 active:scale-95 shadow-lg"
               onClick={() => handleSeleccion(opcionTexto)}
-              disabled={mostrarResultados || cargando}
+              disabled={mostrarResultados || cargando || disabled}
             >
               <span className="flex items-center justify-center gap-2">
                 {cargando && opcionTexto === seleccion && <span className="text-xl">⏳</span>}
@@ -171,7 +171,7 @@ const PreguntaCard = ({ pregunta, onAnswered }) => {
           }`}>
             {esCorrecta
               ? '🎉 ¡Correcto! Bien hecho.'
-              : `❌ Incorrecto. La respuesta correcta es: ${respuestaCorrecta}`
+              : `❌ Incorrecto.`
             }
           </p>
         </div>

@@ -35,7 +35,7 @@ export const useLogin=()=>{
         localStorage.setItem('token', response?.data?.token);
         
         toast.success('Login exitoso')
-        navigate('/game-mode')
+        navigate('/game')
     }
     return{
         login,

@@ -1,22 +1,48 @@
 
-import { useState } from "react"
-import { getMyStreak } from "../routes/services/api"
+import { useEffect, useState } from "react"
+import { toast } from "sonner"
+import { getMyStreak } from "../services/api"
 
 export const useStreaks = () => {
     const [loading, setLoading] = useState(false)
     const [error, setError] = useState(null)
     const [streak, setStreak] = useState([])
+
     const fetchMyStreak = async() => {
         setLoading(true)
         setError(null)
-        const response = await getMyStreak()
-        if (response.error) {
-            setError(response.message)
-        } else {
-            setStreak(response.data)
+        try {
+            const response = await getMyStreak()
+            if (response.error) {
+                const backendErrors = response.e?.response?.data?.errors
+                const backendMessage = response.e?.response?.data?.msg
+                if (backendErrors && Array.isArray(backendErrors)) {
+                    backendErrors.forEach(err => toast.error(err.msg))
+                } else if (backendMessage) {
+                    toast.error(backendMessage)
+                } else {
+                    toast.error('Error desconocido al intentar obtener la racha')
+                }
+                setError(backendMessage || 'Error al obtener la racha')
+                return false
+            } else {
+                setStreak(response.data.data || [])
+                setLoading(false)
+                return true
+            }
+        } catch (error) {
+            setLoading(false)
+            setError(error)
+            console.error("Error fetching streak:", error)
+            toast.error('Hubo un problema al conectar con el servidor')
+            return false
         }
-        setLoading(false)
     }
+
+    useEffect(() => {
+        fetchMyStreak()
+    }, [])
+    
     return {
         loading,
         error,
