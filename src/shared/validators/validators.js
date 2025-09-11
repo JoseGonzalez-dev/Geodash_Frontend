@@ -41,9 +41,9 @@ export const validatePassConfirm = (password, confirmPassword)=>{
 }
 
 
-export const nameValidationMessage = 'El nombre debe tener entre 2 y 30 letras, sin caracteres especiales ni espacios'
-export const surnameValidationMessage = 'El apellido debe tener entre 2 y 30 letras, sin caracteres especiales ni espacios'
-export const emailValidationMessage = 'Por favor ingresa un correo válido'
+export const nameValidationMessage = 'Tu nombre debe tener entre 2 y 20 letras. (Sin espacios ni caracteres especiales)'
+export const surnameValidationMessage = 'Tu apellido debe tener entre 2 y 20 letras. (Sin espacios ni caracteres especiales)'
+export const emailValidationMessage = 'Tu correo no es válido.'
 export const usernameValidationMessage = 'El nombre de usuario debe contener entre 3 y 15 caracteres (Sin espacios)'
 export const passwordValidationMessage = 'La contraseña debe tener entre 6 y 12 caracteres, sin espacios'
 export const passConfirmValidationMessage = 'Las contraseñas no coinciden'

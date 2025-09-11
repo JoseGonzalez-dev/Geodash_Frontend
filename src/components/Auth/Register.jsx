@@ -11,6 +11,7 @@ import {  emailValidationMessage, nameValidationMessage, passConfirmValidationMe
 import { useRegister } from '../../shared/hooks/Auth/useRegister'
 import { useUser } from '../../shared/hooks/User/useUser'
 import { StarsBackground } from '../molecules/StarsBackground'
+import { Link } from 'react-router-dom'
 
 export const Register = ({ switchAuthHandler }) => {
     const form = {
@@ -136,7 +137,6 @@ export const Register = ({ switchAuthHandler }) => {
                                 onBlurHandler={handleValidationOnBlur}
                                 showErrorMessage={formData.email.showError}
                                 validationMessage={emailValidationMessage}
-                                
                             />
                         </div>
                         <div className="flex gap-4 mb-4">
@@ -213,14 +213,17 @@ export const Register = ({ switchAuthHandler }) => {
                             className={`w-full py-2 rounded-md text-white font-bold transition ${
                                 isSubmitButtonDisable
                                     ? 'bg-blue-800 cursor-not-allowed'
-                                    : 'bg-blue-700 hover:bg-green-800 text-white font-bold'
+                                    : 'bg-blue-700 hover:bg-sky-500 text-white font-bold'
                             }`}
                         >
                             Registrar
                         </button>
-                        <button className="w-full bg-blue-800 hover:bg-green-800 text-white font-bold py-2 px-4 mb-6 rounded">
+                        <Link to="/login">
+                        <button className="w-full bg-blue-800 hover:bg-sky-500 text-white font-bold py-2 px-4 mb-6 rounded">
                             Iniciar Sesión
                         </button>
+                        </Link>
+                        
                     </form>
 
                     

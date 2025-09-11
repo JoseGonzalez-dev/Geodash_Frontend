@@ -49,7 +49,11 @@ export const Input = ({
                     />
                 )
             }
-            <span>{showErrorMessage && validationMessage}</span>
+            {showErrorMessage && (
+                <span className="text-red-500 text-sm mt-1 block">
+                    {validationMessage}
+                </span>
+)}
         </>
     )
 }

@@ -4,6 +4,8 @@ import { GameMode } from "../pages/GameMode"
 import { Layout } from "../components/Layout"
 import { Login } from "../components/Auth/Login"
 import { Register } from "../components/Auth/Register"
+import { UpdateUserPage } from "../pages/UserPages/UpdateUser"
+import { ChangePassword } from "../pages/UserPages/ChangePassword"
  
 const router = createBrowserRouter(
     [
@@ -36,7 +38,16 @@ const router = createBrowserRouter(
             path: "/register",
             element: <Register />
  
+        },
+        {
+            path: "/updateUser",
+            element: <UpdateUserPage />
+        },
+        { 
+            path:"/changePass",
+            element: <ChangePassword />
         }
+
     ]
 )
  
