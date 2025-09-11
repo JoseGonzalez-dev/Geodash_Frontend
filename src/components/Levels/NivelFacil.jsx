@@ -4,8 +4,7 @@ import { getPreguntasConOpciones } from "../../services/Questionsapi"
 import PreguntaCard from "../Card/QuestionCard"
 import { useGame } from "../../hooks/useGame"
 import { useUserAnswer } from "../../hooks/useUserAnswer"
-import { GameDebugger } from "../Debug/GameDebugger"
-import { getCurrentUser, getCurrentUserId, isUserLoggedIn } from "../../utils/userUtils"
+import { getCurrentUserId, isUserLoggedIn } from "../../utils/userUtils"
 import { useEndGame } from "../../hooks/useEndGame"
 import { useGameStats } from "../../hooks/useGameStats"
 
@@ -212,15 +211,9 @@ const NivelFacil = () => {
           </button>
         </div>
       </div>
-
-      {/* Debug info */}
-      <GameDebugger 
-        gameId={gameId}
-        currentQuestion={pregunta}
-        user={getCurrentUser()}
-      />
     </div>
   )
 }
 
 export default NivelFacil
+

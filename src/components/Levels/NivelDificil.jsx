@@ -3,8 +3,7 @@ import { getPreguntasConOpciones } from "../../services/Questionsapi"
 import PreguntaCard from "../Card/QuestionCard"
 import { useGame } from "../../hooks/useGame"
 import { useUserAnswer } from "../../hooks/useUserAnswer"
-import { GameDebugger } from "../Debug/GameDebugger"
-import { getCurrentUser, getCurrentUserId, isUserLoggedIn } from "../../utils/userUtils"
+import { getCurrentUserId, isUserLoggedIn } from "../../utils/userUtils"
 
 const NivelDificil = () => {
   const [preguntas, setPreguntas] = useState([])
@@ -174,12 +173,6 @@ const NivelDificil = () => {
         </div>
       </div>
 
-      {/* Debug info */}
-      <GameDebugger 
-        gameId={gameId}
-        currentQuestion={pregunta}
-        user={getCurrentUser()}
-      />
     </div>
   )
 }
