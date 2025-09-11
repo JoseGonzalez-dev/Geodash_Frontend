@@ -1,12 +1,14 @@
 import React, { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { AuthModal } from '../components/molecules/AuthModal'
+import { useStreaks } from '../hooks/useStreaks'
 
 export const GameMode = () => {
     const navigate = useNavigate()
     const [isLoaded, setIsLoaded] = useState(false)
     const [showAuthModal, setShowAuthModal] = useState(false)
     const [isAuthenticated, setIsAuthenticated] = useState(false) // Cambiar a false para probar auth
+    const { loading, error, streak, fetchMyStreak } = useStreaks()
 
     const gameCards = [
         {
@@ -63,7 +65,6 @@ export const GameMode = () => {
 
             const route = routeMap[gameId]
             if (route) {
-                console.log(`Navegando a: ${route}`)
                 navigate(route)
             }
         }
@@ -81,15 +82,38 @@ export const GameMode = () => {
         setShowAuthModal(false)
     }
 
+    // Función para obtener el streak actual de manera segura
+    const getCurrentStreak = () => {
+        if (!streak) return 0
+        
+        // Según la respuesta de la API, los posibles nombres son:
+        return streak.currentStreak || 
+               streak.consecutiveDays || 
+               streak.current || 
+               streak.days || 
+               streak.count || 
+               streak.length || 
+               0
+    }
+
+    // Función para obtener el mejor streak de manera segura
+    const getBestStreak = () => {
+        if (!streak) return null
+        
+        return streak.longestStreak || 
+               streak.maxStreak || 
+               streak.best || 
+               null
+    }
+
     return (
         <div className="min-h-screen flex flex-col items-center justify-center text-white p-8 relative overflow-hidden">
             {/* Fondo animado que simula aterrizar en la Tierra */}
             <div className={`absolute inset-0 bg-gradient-to-b from-blue-900/20 via-blue-800/10 to-green-900/20 transition-all duration-2000 ${isLoaded ? 'opacity-100' : 'opacity-0'}`}></div>
 
-
             {/* Cards de juego */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl w-full mt-0 relative z-10">
-                {gameCards.map((card, index) => (
+                {gameCards.map((card) => (
                     <div
                         key={card.id}
                         className={`relative group transform transition-all duration-1000 ease-out ${card.delay} ${isLoaded
@@ -137,15 +161,50 @@ export const GameMode = () => {
                 }`}>
                 {isAuthenticated ? (
                     <div className="bg-gray-800/90 backdrop-blur-sm rounded-xl px-6 py-4 border border-gray-600/50 hover:border-orange-400/50 transition-all duration-300">
-                        <div className="flex items-center space-x-3">
-                            <span className="text-2xl animate-bounce">🔥</span>
-                            <span className="text-white font-semibold">¡Estás en racha!</span>
-                        </div>
-                        {/* Progress bar */}
-                        <div className="w-48 h-2 bg-gray-600 rounded-full mt-2 overflow-hidden">
-                            <div className={`h-full bg-gradient-to-r from-orange-400 to-red-500 rounded-full transition-all duration-2000 delay-1000 ${isLoaded ? 'w-1/3' : 'w-0'
-                                }`}></div>
-                        </div>
+                        {loading ? (
+                            <div className="flex items-center space-x-3">
+                                <span className="text-2xl animate-spin">⏳</span>
+                                <span className="text-white font-semibold">Cargando racha...</span>
+                            </div>
+                        ) : error ? (
+                            <div className="flex items-center space-x-3">
+                                <span className="text-2xl">❌</span>
+                                <span className="text-red-400 font-semibold">Error al cargar racha</span>
+                                <button
+                                    onClick={fetchMyStreak}
+                                    className="ml-2 text-xs bg-red-500/20 px-2 py-1 rounded hover:bg-red-500/40 transition-colors"
+                                >
+                                    Reintentar
+                                </button>
+                            </div>
+                        ) : (
+                            <>
+                                <div className="flex items-center space-x-3">
+                                    <span className="text-2xl animate-bounce">🔥</span>
+                                    <span className="text-white font-semibold">
+                                        Racha: {getCurrentStreak()} días
+                                    </span>
+                                </div>
+
+                                {/* Progress bar basada en datos reales */}
+                                <div className="w-48 h-2 bg-gray-600 rounded-full mt-2 overflow-hidden">
+                                    <div
+                                        className={`h-full bg-gradient-to-r from-orange-400 to-red-500 rounded-full transition-all duration-2000 delay-1000`}
+                                        style={{
+                                            width: `${Math.min((getCurrentStreak() * 10), 100)}%`
+                                        }}
+                                    />
+                                </div>
+
+                                {/* Mostrar mejor racha si está disponible */}
+                                {getBestStreak() && (
+                                    <div className="text-xs text-gray-400 mt-1 text-center">
+                                        Mejor racha: {getBestStreak()} días
+                                    </div>
+                                )}
+
+                            </>
+                        )}
                     </div>
                 ) : (
                     <button

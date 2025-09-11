@@ -4,12 +4,10 @@ import { loadSlim } from "tsparticles-slim"
 
 export const StarsBackground = ({ mode = "space" }) => {
     const particlesInit = useCallback(async engine => {
-        console.log("Inicializando partículas...")
         await loadSlim(engine)
     }, [])
 
     const particlesLoaded = useCallback(async container => {
-        console.log("Partículas cargadas:", container)
         if (container) {
             container.refresh()
         }
