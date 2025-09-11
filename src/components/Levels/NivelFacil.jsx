@@ -4,7 +4,7 @@ import { getPreguntasConOpciones } from "../../services/Questionsapi"
 import PreguntaCard from "../Card/QuestionCard"
 import { useGame } from "../../hooks/useGame"
 import { useUserAnswer } from "../../hooks/useUserAnswer"
-import { getCurrentUser, getCurrentUserId, isUserLoggedIn } from "../../utils/userUtils"
+import { getCurrentUserId, isUserLoggedIn } from "../../utils/userUtils"
 import { useEndGame } from "../../hooks/useEndGame"
 import { useGameStats } from "../../hooks/useGameStats"
 
