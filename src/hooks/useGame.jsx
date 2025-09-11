@@ -32,9 +32,9 @@ export const useGame = () => {
                 return { error: true, message: backendMessage }
             }
 
-            // ✅ Manejar respuesta exitosa del backend
             if (response.data?.success) {
-                toast.success(response.data.message || 'Partida creada correctamente')
+                // toast.success(response.data.message || 'Partida creada correctamente')
+                toast.success('Partida iniciada ¡Buena suerte!')
                 return response.data
             }
 

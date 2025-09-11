@@ -171,7 +171,7 @@ const PreguntaCard = ({ pregunta, onAnswered, disabled = false }) => {
           }`}>
             {esCorrecta
               ? '🎉 ¡Correcto! Bien hecho.'
-              : `❌ Incorrecto.`
+              : `❌ Esta mal.`
             }
           </p>
         </div>
