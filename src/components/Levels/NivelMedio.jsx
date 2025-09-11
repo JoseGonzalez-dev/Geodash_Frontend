@@ -4,14 +4,25 @@ import PreguntaCard from "../Card/QuestionCard"
 import { useGame } from "../../hooks/useGame"
 import { useUserAnswer } from "../../hooks/useUserAnswer"
 import { getCurrentUserId, isUserLoggedIn } from "../../utils/userUtils"
+import { useNavigate } from "react-router-dom"
+import { useGameStats } from "../../hooks/useGameStats"
+import { useEndGame } from "../../hooks/useEndGame"
+import { VictoryModal, DefeatModal } from "../molecules/WinLoseModal"
 
 const NivelMedio = () => {
   const [preguntas, setPreguntas] = useState([])
   const [currentIndex, setCurrentIndex] = useState(0)
   const [gameId, setGameId] = useState(null)
   const [startTime, setStartTime] = useState(null)
+  const [userAnswer, setUserAnswer] = useState([])
+  const [showVictoryModal, setShowVictoryModal] = useState(false)
+  const [showDefeatModal, setShowDefeatModal] = useState(false)
+  const [gameStats, setGameStats] = useState({})
   const { sendRequest: createGame, loading: creatingGame } = useGame()
   const { sendRequest: saveAnswer, loading: savingAnswer } = useUserAnswer()
+  const { endGame } = useEndGame()
+  const { calculateStats } = useGameStats()
+  const navigate = useNavigate()
 
   useEffect(() => {
     let isCancelled = false;
@@ -20,55 +31,40 @@ const NivelMedio = () => {
       try {
         // Verificar si ya hay una partida en progreso
         if (gameId) {
-          console.log('⚠️ [NivelMedio] Ya existe una partida:', gameId)
           return
         }
         
-        // 1. Crear la partida en el backend
-        console.log('🔍 [NivelMedio] Verificando usuario logueado...')
         
         if (!isUserLoggedIn()) {
-          console.warn('⚠️ [NivelMedio] Usuario no logueado, redirigiendo...')
+          navigate('/login')
           return
         }
         
         const userId = getCurrentUserId()
         if (!userId) {
-          console.error('❌ [NivelMedio] No se pudo obtener ID del usuario')
           return
         }
         
-        console.log('🎮 [NivelMedio] Creando partida nivel Medio para usuario:', userId)
         const gameData = {
           user: userId,
           difficulty: 'Medio'
         }
-        console.log('📊 [NivelMedio] Datos de partida a enviar:', gameData)
         
         const gameResult = await createGame(gameData)
-        console.log('🎯 [NivelMedio] Resultado de creación:', gameResult)
         
         if (!isCancelled && !gameResult.error && gameResult.data) {
           const newGameId = gameResult.data._id || gameResult.data.id
           setGameId(newGameId)
-          console.log('✅ [NivelMedio] Partida creada con ID:', newGameId)
         } else if (!isCancelled) {
           console.error('❌ [NivelMedio] Error creando partida:', gameResult)
         }
 
-        // 2. Cargar las preguntas
-        console.log('✈️ Fetching preguntas para nivel Medio...')
         const res = await getPreguntasConOpciones()
-        console.log('📦 Respuesta completa de la API:', res)
         
         if (res.success) {
           const todasLasPreguntas = res.preguntas
-          console.log('📝 Todas las preguntas:', todasLasPreguntas)
-          console.log('🎯 Dificultades disponibles:', [...new Set(todasLasPreguntas.map(p => p.dificultad))])
           
           const preguntasMedio = todasLasPreguntas.filter(p => p.dificultad === "Medio")
-          console.log('✅ Preguntas medio encontradas:', preguntasMedio.length)
-          console.log('✈️ Primera pregunta medio:', preguntasMedio[0])
           
           setPreguntas(preguntasMedio)
           // Inicializar timer para la primera pregunta
@@ -85,19 +81,12 @@ const NivelMedio = () => {
   }, [])
 
   const handleAnswered = async (isCorrect, selectedOption) => {
-    console.log('🎯 [NivelMedio] Respuesta recibida:', { isCorrect, selectedOption })
-    console.log('🎮 [NivelMedio] GameId actual:', gameId)
-    console.log('❓ [NivelMedio] Pregunta actual:', preguntas[currentIndex])
-    
     if (!gameId || !preguntas[currentIndex]) {
-      console.error('❌ [NivelMedio] Faltan datos:', { gameId, pregunta: preguntas[currentIndex] })
       return
     }
 
     const responseTime = startTime ? Date.now() - startTime : 0
-    console.log('⏱️ [NivelMedio] Tiempo de respuesta:', responseTime, 'ms')
     
-    // Guardar la respuesta en el backend
     const questionId = preguntas[currentIndex]._id || preguntas[currentIndex].id
     if (!questionId) {
       console.error('❌ [NivelMedio] No se encontró ID de la pregunta:', preguntas[currentIndex])
@@ -111,10 +100,7 @@ const NivelMedio = () => {
       responseTimeMs: responseTime
     }
     
-    console.log('💾 [NivelMedio] Datos de respuesta a enviar:', answerData)
-
     const result = await saveAnswer(answerData)
-    console.log('📋 [NivelMedio] Resultado de guardado:', result)
     
     if (result && !result.error) {
       console.log('✅ [NivelMedio] Respuesta guardada exitosamente:', result.data)
@@ -132,6 +118,57 @@ const NivelMedio = () => {
         console.log('🎉 [NivelMedio] Juego completado!')
       }
     }, 2000)
+
+    const newAnswer ={
+      isCorrect,
+      selectedOption,
+      responseTimeMs: responseTime,
+      questionId: preguntas[currentIndex]._id || preguntas[currentIndex].id
+    }
+
+    setUserAnswer(prev => [...prev, newAnswer])
+
+    if (currentIndex >= preguntas.length - 1) {
+      const allAnswers = [...userAnswer, newAnswer]
+      const stats = calculateStats(allAnswers)
+      
+      const gameData ={
+        endDate: new Date().toISOString(),
+        totalScore: stats.totalScore,
+        correctAnswers: stats.correctAnswers,
+        totalResponseTimeMs: stats.totalResponseTimeMs
+      }
+
+      const result = await endGame(gameId, gameData)
+
+      if(result.success){
+        console.log('🏆 [NivelMedio] Juego finalizado exitosamente:', result)
+        
+        // Determinar si el usuario ganó o perdió (70% de respuestas correctas para ganar)
+        const passingScore = Math.ceil(preguntas.length * 0.7)
+        const didWin = stats.correctAnswers >= passingScore
+        
+        // Preparar estadísticas para el modal
+        const modalStats = {
+          score: stats.totalScore,
+          correctAnswers: stats.correctAnswers,
+          totalQuestions: preguntas.length,
+          timeBonus: Math.floor(stats.averageResponseTimeMs < 4000 ? 200 : 75),
+          streakBonus: Math.floor(stats.longestStreak * 30),
+          difficulty: 'Viajero',
+          bestScore: stats.totalScore // Podríamos obtener el mejor puntaje del usuario en el futuro
+        }
+        
+        setGameStats(modalStats)
+        
+        // Mostrar el modal correspondiente
+        if (didWin) {
+          setShowVictoryModal(true)
+        } else {
+          setShowDefeatModal(true)
+        }
+      }
+    }
   }
 
   const handleNext = () => {
@@ -160,6 +197,18 @@ const NivelMedio = () => {
 
   return (
     <div className="relative flex min-h-screen w-full items-center justify-center bg-gradient-to-b from-sky-300 to-pink-200 p-4 md:p-6 lg:p-8">
+      {/* Modal de Victoria */}
+      <VictoryModal 
+        isOpen={showVictoryModal} 
+        gameStats={gameStats} 
+      />
+      
+      {/* Modal de Derrota */}
+      <DefeatModal 
+        isOpen={showDefeatModal} 
+        gameStats={gameStats} 
+      />
+      
       <div className="relative w-full max-w-5xl mx-auto rounded-2xl bg-white/80 p-6 md:p-8 lg:p-12 shadow-xl backdrop-blur-md">
         {/* Barra de progreso */}
         <div className="mb-6">
