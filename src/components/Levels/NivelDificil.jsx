@@ -1,28 +1,138 @@
 import React, { useEffect, useState } from "react"
 import { getPreguntasConOpciones } from "../../services/Questionsapi"
 import PreguntaCard from "../Card/QuestionCard"
+import { useGame } from "../../hooks/useGame"
+import { useUserAnswer } from "../../hooks/useUserAnswer"
+import { getCurrentUserId, isUserLoggedIn } from "../../utils/userUtils"
 
 const NivelDificil = () => {
   const [preguntas, setPreguntas] = useState([])
   const [currentIndex, setCurrentIndex] = useState(0)
+  const [gameId, setGameId] = useState(null)
+  const [startTime, setStartTime] = useState(null)
+  const { sendRequest: createGame, loading: creatingGame } = useGame()
+  const { sendRequest: saveAnswer, loading: savingAnswer } = useUserAnswer()
 
   useEffect(() => {
-    const fetchPreguntas = async () => {
-      const res = await getPreguntasConOpciones()
-      if (res.success) {
-        setPreguntas(res.preguntas.filter(p => p.dificultad === "Difícil"))
+    const initializeGame = async () => {
+      try {
+        // 1. Crear la partida en el backend
+        console.log('🔍 [NivelDificil] Verificando usuario logueado...')
+        
+        if (!isUserLoggedIn()) {
+          console.warn('⚠️ [NivelDificil] Usuario no logueado, redirigiendo...')
+          return
+        }
+        
+        const userId = getCurrentUserId()
+        if (!userId) {
+          console.error('❌ [NivelDificil] No se pudo obtener ID del usuario')
+          return
+        }
+        
+        console.log('🎮 [NivelDificil] Creando partida nivel Difícil para usuario:', userId)
+        const gameData = {
+          user: userId,
+          difficulty: 'Difícil'
+        }
+        console.log('📊 [NivelDificil] Datos de partida a enviar:', gameData)
+        
+        const gameResult = await createGame(gameData)
+        console.log('🎯 [NivelDificil] Resultado de creación:', gameResult)
+        
+        if (!gameResult.error && gameResult.data) {
+          const gameId = gameResult.data._id || gameResult.data.id
+          setGameId(gameId)
+          console.log('✅ [NivelDificil] Partida creada con ID:', gameId)
+        } else {
+          console.error('❌ [NivelDificil] Error creando partida:', gameResult)
+        }
+
+        // 2. Cargar las preguntas
+        const res = await getPreguntasConOpciones()
+        if (res.success) {
+          const preguntasDificiles = res.preguntas.filter(p => p.dificultad === "Difícil")
+          setPreguntas(preguntasDificiles)
+          // Inicializar timer para la primera pregunta
+          setStartTime(Date.now())
+        }
+      } catch (error) {
+        console.error('💥 Error initializing game:', error)
       }
     }
-    fetchPreguntas()
+    
+    initializeGame()
   }, [])
+
+  const handleAnswered = async (isCorrect, selectedOption) => {
+    console.log('🎯 [NivelDificil] Respuesta recibida:', { isCorrect, selectedOption })
+    console.log('🎮 [NivelDificil] GameId actual:', gameId)
+    console.log('❓ [NivelDificil] Pregunta actual:', preguntas[currentIndex])
+    
+    if (!gameId || !preguntas[currentIndex]) {
+      console.error('❌ [NivelDificil] Faltan datos:', { gameId, pregunta: preguntas[currentIndex] })
+      return
+    }
+
+    const responseTime = startTime ? Date.now() - startTime : 0
+    console.log('⏱️ [NivelDificil] Tiempo de respuesta:', responseTime, 'ms')
+    
+    // Guardar la respuesta en el backend
+    const questionId = preguntas[currentIndex]._id || preguntas[currentIndex].id
+    if (!questionId) {
+      console.error('❌ [NivelDificil] No se encontró ID de la pregunta:', preguntas[currentIndex])
+      return
+    }
+    
+    const answerData = {
+      game: gameId,
+      question: questionId,
+      selectedOption: selectedOption,
+      responseTimeMs: responseTime
+    }
+    
+    console.log('💾 [NivelDificil] Datos de respuesta a enviar:', answerData)
+
+    const result = await saveAnswer(answerData)
+    console.log('📋 [NivelDificil] Resultado de guardado:', result)
+    
+    if (result && !result.error) {
+      console.log('✅ [NivelDificil] Respuesta guardada exitosamente:', result.data)
+    } else {
+      console.error('❌ [NivelDificil] Error guardando respuesta:', result)
+    }
+
+    // Auto-avanzar después de 2 segundos
+    setTimeout(() => {
+      if (currentIndex < preguntas.length - 1) {
+        console.log('➡️ [NivelDificil] Avanzando a siguiente pregunta...')
+        setCurrentIndex(currentIndex + 1)
+        setStartTime(Date.now()) // Reiniciar timer para la siguiente pregunta
+      } else {
+        console.log('🎉 [NivelDificil] Juego completado!')
+      }
+    }, 2000)
+  }
 
   const handleNext = () => {
     if (currentIndex < preguntas.length - 1) {
       setCurrentIndex(currentIndex + 1)
+      setStartTime(Date.now())
     }
   }
 
-  if (preguntas.length === 0) return <p>Cargando preguntas...</p>
+  if (creatingGame || preguntas.length === 0) {
+    return (
+      <div className="relative flex h-screen w-full items-center justify-center bg-gradient-to-b from-blue-900 via-slate-900 to-black">
+        <div className="text-center">
+          <div className="text-6xl mb-4 animate-spin">🏆</div>
+          <p className="text-xl text-white">
+            {creatingGame ? 'Iniciando partida...' : 'Cargando preguntas nivel Difícil...'}
+          </p>
+        </div>
+      </div>
+    )
+  }
 
   const pregunta = preguntas[currentIndex]
   const progreso = ((currentIndex + 1) / preguntas.length) * 100
@@ -47,13 +157,8 @@ const NivelDificil = () => {
         <PreguntaCard 
           key={currentIndex}
           pregunta={pregunta} 
-          onAnswered={() => {
-            setTimeout(() => {
-              if (currentIndex < preguntas.length - 1) {
-                handleNext()
-              }
-            }, 2000)
-          }}
+          onAnswered={handleAnswered}
+          disabled={savingAnswer}
         />
 
         {/* Botón de siguiente (opcional) */}
@@ -67,6 +172,7 @@ const NivelDificil = () => {
           </button>
         </div>
       </div>
+
     </div>
   )
 }

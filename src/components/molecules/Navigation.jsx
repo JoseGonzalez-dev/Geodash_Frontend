@@ -7,13 +7,26 @@ export const Navigation = () => {
 
   if (location.pathname === '/') return null // No mostrar en HomePage
 
+  const {text, path} = (() => {
+    let text = '← Inicio'
+    let path = '/'
+
+    if (location.pathname.startsWith('/game/') && location.pathname !== '/game') {
+      text = '← Regresar'
+      path = '/game'
+    }
+
+    return { text, path }
+  })()
+
+
   return (
     <div className="absolute top-8 left-8 right-8 flex justify-between items-center z-20">
       <button
-        onClick={() => navigate('/')}
+        onClick={() => navigate(path)}
         className="bg-gray-700/80 hover:bg-gray-600/80 backdrop-blur-sm text-white px-4 py-2 rounded-lg transition-colors border border-gray-600/50"
       >
-        ← Inicio
+        {text}
       </button>
       
       <h1 
