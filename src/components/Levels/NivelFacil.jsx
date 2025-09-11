@@ -1,50 +1,172 @@
 import React, { useEffect, useState } from "react"
+import { useNavigate } from "react-router-dom"
 import { getPreguntasConOpciones } from "../../services/Questionsapi"
 import PreguntaCard from "../Card/QuestionCard"
+import { useGame } from "../../hooks/useGame"
+import { useUserAnswer } from "../../hooks/useUserAnswer"
+import { GameDebugger } from "../Debug/GameDebugger"
+import { getCurrentUser, getCurrentUserId, isUserLoggedIn } from "../../utils/userUtils"
+import { useEndGame } from "../../hooks/useEndGame"
+import { useGameStats } from "../../hooks/useGameStats"
 
 const NivelFacil = () => {
   const [preguntas, setPreguntas] = useState([])
   const [currentIndex, setCurrentIndex] = useState(0)
+  const [gameId, setGameId] = useState(null)
+  const [startTime, setStartTime] = useState(null)
+  const [userAnswer, setUserAnswer] = useState([])
+  const { sendRequest: createGame, loading: creatingGame } = useGame()
+  const { sendRequest: saveAnswer, loading: savingAnswer } = useUserAnswer()
+  const { endGame } = useEndGame()
+  const { calculateStats } = useGameStats()
+  const navigate = useNavigate()
 
   useEffect(() => {
-    const fetchPreguntas = async () => {
+    let isCancelled = false; // Flag para evitar actualizaciones si el componente se desmonta
+    
+    const initializeGame = async () => {
       try {
-        console.log('🔍 Fetching preguntas para nivel Fácil...')
+        // Verificar si ya hay una partida en progreso
+        if (gameId) {
+          return
+        }
+        
+        if (!isUserLoggedIn()) {
+          navigate('/login')
+          return
+        }
+        
+        const userId = getCurrentUserId()
+        if (!userId) {
+          return
+        }
+        
+        const gameData = {
+          user: userId,
+          difficulty: 'Fácil'
+        }
+        
+        const gameResult = await createGame(gameData)
+        
+        // Solo actualizar el estado si el componente no se ha desmontado
+        if (!isCancelled && !gameResult.error && gameResult.data) {
+          const newGameId = gameResult.data._id || gameResult.data.id
+          setGameId(newGameId)
+          console.log('✅ [NivelFacil] Partida creada con ID:', newGameId)
+        } else if (!isCancelled) {
+          console.error('❌ [NivelFacil] Error creando partida:', gameResult)
+        }
+
+        // 2. Cargar las preguntas
         const res = await getPreguntasConOpciones()
-        console.log('📦 Respuesta completa de la API:', res)
 
         if (res.success) {
           const todasLasPreguntas = res.preguntas
-          console.log('📝 Todas las preguntas:', todasLasPreguntas)
-          console.log('🎯 Dificultades disponibles:', [...new Set(todasLasPreguntas.map(p => p.dificultad))])
 
           const preguntasFaciles = todasLasPreguntas.filter(p => p.dificultad === "Fácil")
-          console.log('✅ Preguntas fáciles encontradas:', preguntasFaciles.length)
-          console.log('🔍 Primera pregunta fácil:', preguntasFaciles[0])
 
           setPreguntas(preguntasFaciles)
+          // Inicializar timer para la primera pregunta
+          setStartTime(Date.now())
         } else {
           console.error('❌ API response not successful:', res)
         }
       } catch (error) {
-        console.error('💥 Error fetching preguntas:', error)
+        console.error('💥 Error initializing game:', error)
       }
     }
-    fetchPreguntas()
+    
+    initializeGame()
   }, [])
+
+  const handleAnswered = async (isCorrect, selectedOption) => {
+    
+    if (!gameId || !preguntas[currentIndex]) {
+      console.error('❌ [NivelFacil] Faltan datos:', { gameId, pregunta: preguntas[currentIndex] })
+      return
+    }
+
+    const responseTime = startTime ? Date.now() - startTime : 0
+    console.log('⏱️ [NivelFacil] Tiempo de respuesta:', responseTime, 'ms')
+    
+    // Guardar la respuesta en el backend
+    const questionId = preguntas[currentIndex]._id || preguntas[currentIndex].id
+    if (!questionId) {
+      console.error('❌ [NivelFacil] No se encontró ID de la pregunta:', preguntas[currentIndex])
+      return
+    }
+    
+    const answerData = {
+      game: gameId,
+      question: questionId,
+      selectedOption: selectedOption,
+      responseTimeMs: responseTime
+    }
+    
+
+    const result = await saveAnswer(answerData)
+    
+    if (result && !result.error) {
+      console.log('✅ [NivelFacil] Respuesta guardada exitosamente:', result.data)
+    } else {
+      console.error('❌ [NivelFacil] Error guardando respuesta:', result)
+    }
+
+    // Auto-avanzar después de 2 segundos
+    setTimeout(() => {
+      if (currentIndex < preguntas.length - 1) {
+        setCurrentIndex(currentIndex + 1)
+        setStartTime(Date.now()) // Reiniciar timer para la siguiente pregunta
+      } else {
+        console.log('🎉 [NivelFacil] Juego completado!')
+        // Aquí podrías actualizar el estado final del juego
+      }
+    }, 2000)
+
+    const newAnswer ={
+      isCorrect,
+      selectedOption,
+      responseTimeMs: responseTime,
+      questionId: preguntas[currentIndex]._id || preguntas[currentIndex].id
+    }
+
+    setUserAnswer(prev => [...prev, newAnswer])
+
+    if (currentIndex >= preguntas.length - 1) {
+      const allAnswers = [...userAnswer, newAnswer]
+      const stats = calculateStats(allAnswers)
+      
+      const gameData ={
+        endDate: new Date().toISOString(),
+        totalScore: stats.totalScore,
+        correctAnswers: stats.correctAnswers,
+        totalResponseTimeMs: stats.totalResponseTimeMs
+      }
+
+      const result = await endGame(gameId, gameData)
+
+      if(result.success){
+        console.log('🏆 [NivelFacil] Juego finalizado exitosamente:', result)
+        alert(`Juego finalizado! Puntuación: ${gameData.totalScore}/${preguntas.length}`)
+      }
+    }
+  }
 
   const handleNext = () => {
     if (currentIndex < preguntas.length - 1) {
       setCurrentIndex(currentIndex + 1)
+      setStartTime(Date.now())
     }
   }
 
-  if (preguntas.length === 0) {
+  if (creatingGame || preguntas.length === 0) {
     return (
       <div className="relative flex h-screen w-full items-center justify-center bg-gradient-to-b from-sky-200 to-green-200">
         <div className="text-center">
           <div className="text-6xl mb-4 animate-spin">🌍</div>
-          <p className="text-xl text-gray-700">Cargando preguntas nivel Fácil...</p>
+          <p className="text-xl text-gray-700">
+            {creatingGame ? 'Iniciando partida...' : 'Cargando preguntas nivel Fácil...'}
+          </p>
           <p className="text-sm text-gray-500 mt-2">Revisa la consola para más detalles</p>
         </div>
       </div>
@@ -74,14 +196,9 @@ const NivelFacil = () => {
         <PreguntaCard
           key={currentIndex} // Reinicia el componente cuando cambia la pregunta
           pregunta={pregunta}
-          onAnswered={() => {
-            // Auto-avanzar después de 2 segundos
-            setTimeout(() => {
-              if (currentIndex < preguntas.length - 1) {
-                handleNext()
-              }
-            }, 2000)
-          }}
+          onAnswered={handleAnswered} // ✅ Pasar la función que maneja la respuesta
+          disabled={savingAnswer} // Deshabilitar mientras se guarda
+          
         />
 
         {/* Botón de siguiente (opcional) */}
@@ -95,6 +212,13 @@ const NivelFacil = () => {
           </button>
         </div>
       </div>
+
+      {/* Debug info */}
+      <GameDebugger 
+        gameId={gameId}
+        currentQuestion={pregunta}
+        user={getCurrentUser()}
+      />
     </div>
   )
 }
