@@ -1,105 +1,105 @@
 import axios from "axios";
 
-const apiClient=axios.create(
+const apiClient = axios.create(
     {
-        baseURL:'http://localhost:2636/v1/',
-        timeout:10000
+        baseURL: `${import.meta.env.VITE_API_BACKEND}/user/`,
+        timeout: 10000
     }
 )
 
 apiClient.interceptors.request.use(
-    (config)=>{
-        const token=localStorage.getItem('token')
-        if(token){
-            config.headers.Authorization=token
+    (config) => {
+        const token = localStorage.getItem('token')
+        if (token) {
+            config.headers.Authorization = token
         }
         return config
     }
 )
 
-export const updateUserRequest = async(id,data)=>{
+export const updateUserRequest = async (id, data) => {
     try {
-        return await apiClient.put(`user/update-employe/${id}`,data)
+        return await apiClient.put(`update-employe/${id}`, data)
     } catch (e) {
-        return{
-            error:true,
+        return {
+            error: true,
             e
         }
     }
 }
 
-export const getUserRequest = async(id)=>{
+export const getUserRequest = async (id) => {
     try {
-        return await apiClient.get(`user/get-employe/${id}`)
+        return await apiClient.get(`get-employe/${id}`)
     } catch (e) {
-        return{
-            error:true,
+        return {
+            error: true,
             e
         }
     }
 }
 
-export const changePasswordRequest = async(oldPass,newPass)=>{
+export const changePasswordRequest = async (oldPass, newPass) => {
     try {
-        return await apiClient.put(`user/update-password`,{oldPassword:oldPass,newPassword:newPass})
+        return await apiClient.put(`update-password`, { oldPassword: oldPass, newPassword: newPass })
     } catch (e) {
-        return{
-            error:true,
+        return {
+            error: true,
             e
         }
     }
 }
 
-export const getUsersRequest = async()=>{
+export const getUsersRequest = async () => {
     try {
-        return await apiClient.get('user/get-employes')
+        return await apiClient.get('get-employes')
     } catch (e) {
-        return{
-            error:true,
+        return {
+            error: true,
             e
         }
     }
 }
 
-export const addEmployeeRequest = async(employe)=>{
+export const addEmployeeRequest = async (employe) => {
     try {
-        return await apiClient.post('user/employe-register',employe)
+        return await apiClient.post('employe-register', employe)
     } catch (e) {
-        return{
-            error:true,
+        return {
+            error: true,
             e
         }
     }
 }
 
-export const deleteProfileRequest = async(id)=>{
+export const deleteProfileRequest = async (id) => {
     try {
-        return await apiClient.delete(`user/delete-employe/${id}`)
+        return await apiClient.delete(`delete-employe/${id}`)
     } catch (e) {
-        return{
-            error:true,
+        return {
+            error: true,
             e
         }
     }
 }
 
-export const usernameExistRequest = async(username)=>{
+export const usernameExistRequest = async (username) => {
     try {
-        return await apiClient.post(`user/username-exist`,{username:username})
+        return await apiClient.post(`username-exist`, { username: username })
     } catch (e) {
-        return{
-            error:true,
+        return {
+            error: true,
             e
         }
     }
 }
 
-export const emailExistRequest = async(email)=>{
+export const emailExistRequest = async (email) => {
     try {
-        return await apiClient.post(`user/email-exist`,{email:email})
+        return await apiClient.post(`email-exist`, { email: email })
     } catch (e) {
-        return{
-            error:true,
+        return {
+            error: true,
             e
         }
     }

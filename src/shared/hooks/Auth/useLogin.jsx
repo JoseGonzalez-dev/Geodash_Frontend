@@ -15,20 +15,27 @@ export const useLogin=()=>{
             password
         }
 
+        console.log('🚀 Iniciando petición de login:', user)
+        console.log('📡 URL de la API:', `${import.meta.env.VITE_API_BACKEND}/auth/login`)
+        
         const response=await loginRequest(user)
-        setIsLoading
+        console.log('📥 Respuesta del login:', response)
+        setIsLoading(false)
         
         
         if(response.error){
-            return toast.error(
+            toast.error(
                 response?.e?.response?.data?.message||
                 'Error al intentar inciar sesión. Intente de nuevo'
             )
+            return
         }
+        
         localStorage.setItem('user',JSON.stringify(response?.data?.loggedUser))
         localStorage.setItem('token', response?.data?.token);
-
-        navigate('/login')
+        
+        toast.success('Login exitoso')
+        navigate('/game')
     }
     return{
         login,

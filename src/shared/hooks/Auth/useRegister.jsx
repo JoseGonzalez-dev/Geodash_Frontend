@@ -11,7 +11,12 @@ export const useRegister=()=>{
 
     const register=async(user)=>{
         setIsLoading(true)
+        
+        console.log('🚀 Iniciando petición de registro:', user)
+        console.log('📡 URL de la API:', `${import.meta.env.VITE_API_BACKEND}/auth/register`)
+        
         const response=await registerRequest(user)
+        console.log('📥 Respuesta del registro:', response)
         setIsLoading(false)
         console.log(response.e);
         
@@ -31,7 +36,7 @@ export const useRegister=()=>{
         }
         setError(false)
         toast.success('Registro exitoso')
-        navigate('/register')
+        navigate('/auth')
     }
     return{
         register,
