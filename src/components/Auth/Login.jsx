@@ -3,6 +3,8 @@ import { validateEmailOrUsername, validatePassword } from "../../shared/validato
 import { useLogin } from "../../shared/hooks/Auth/useLogin.jsx"
 import { Input } from "../../components/Input.jsx"
 import { StarsBackground } from "../molecules/StarsBackground.jsx";
+import { useNavigate } from "react-router-dom";
+import { Link } from 'react-router-dom';
 
 export const Login = ({ switchAuthHandler }) => {
     const { login } = useLogin();
@@ -42,6 +44,10 @@ export const Login = ({ switchAuthHandler }) => {
         e.preventDefault();
         login(formData.userLogin.value, formData.password.value);
     };
+
+    const crearCuenta = () => {
+        useNavigate("/register")
+    }
 
     return (
         <div className="flex items-center justify-center min-h-screen" >
@@ -86,9 +92,12 @@ export const Login = ({ switchAuthHandler }) => {
                         >
                             Login
                         </button>
-                        <button className="w-full bg-blue-700 hover:bg-green-800 text-white font-bold py-2 px-4 mb-6 rounded">
-                        Create Account
-                    </button>
+                        <Link to="/register">
+                            <button className="w-full bg-blue-700 hover:bg-green-800 text-white font-bold py-2 px-4 mb-6 rounded" onClick={crearCuenta}>
+                                Create Account
+                            </button>
+                        </Link>
+                        
                     </form>
 
                     

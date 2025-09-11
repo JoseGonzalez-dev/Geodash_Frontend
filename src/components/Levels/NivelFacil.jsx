@@ -7,6 +7,7 @@ import { useUserAnswer } from "../../hooks/useUserAnswer"
 import { getCurrentUserId, isUserLoggedIn } from "../../utils/userUtils"
 import { useEndGame } from "../../hooks/useEndGame"
 import { useGameStats } from "../../hooks/useGameStats"
+import { VictoryModal, DefeatModal } from "../molecules/WinLoseModal"
 
 const NivelFacil = () => {
   const [preguntas, setPreguntas] = useState([])
@@ -14,6 +15,9 @@ const NivelFacil = () => {
   const [gameId, setGameId] = useState(null)
   const [startTime, setStartTime] = useState(null)
   const [userAnswer, setUserAnswer] = useState([])
+  const [showVictoryModal, setShowVictoryModal] = useState(false)
+  const [showDefeatModal, setShowDefeatModal] = useState(false)
+  const [gameStats, setGameStats] = useState({})
   const { sendRequest: createGame, loading: creatingGame } = useGame()
   const { sendRequest: saveAnswer, loading: savingAnswer } = useUserAnswer()
   const { endGame } = useEndGame()
@@ -81,17 +85,14 @@ const NivelFacil = () => {
   const handleAnswered = async (isCorrect, selectedOption) => {
     
     if (!gameId || !preguntas[currentIndex]) {
-      console.error('❌ [NivelFacil] Faltan datos:', { gameId, pregunta: preguntas[currentIndex] })
       return
     }
 
     const responseTime = startTime ? Date.now() - startTime : 0
-    console.log('⏱️ [NivelFacil] Tiempo de respuesta:', responseTime, 'ms')
     
     // Guardar la respuesta en el backend
     const questionId = preguntas[currentIndex]._id || preguntas[currentIndex].id
     if (!questionId) {
-      console.error('❌ [NivelFacil] No se encontró ID de la pregunta:', preguntas[currentIndex])
       return
     }
     
@@ -146,7 +147,30 @@ const NivelFacil = () => {
 
       if(result.success){
         console.log('🏆 [NivelFacil] Juego finalizado exitosamente:', result)
-        alert(`Juego finalizado! Puntuación: ${gameData.totalScore}/${preguntas.length}`)
+        
+        // Determinar si el usuario ganó o perdió (70% de respuestas correctas para ganar)
+        const passingScore = Math.ceil(preguntas.length * 0.7)
+        const didWin = stats.correctAnswers >= passingScore
+        
+        // Preparar estadísticas para el modal
+        const modalStats = {
+          score: stats.totalScore,
+          correctAnswers: stats.correctAnswers,
+          totalQuestions: preguntas.length,
+          timeBonus: Math.floor(stats.averageResponseTimeMs < 5000 ? 150 : 50),
+          streakBonus: Math.floor(stats.longestStreak * 25),
+          difficulty: 'Fácil',
+          bestScore: stats.totalScore // Podríamos obtener el mejor puntaje del usuario en el futuro
+        }
+        
+        setGameStats(modalStats)
+        
+        // Mostrar el modal correspondiente
+        if (didWin) {
+          setShowVictoryModal(true)
+        } else {
+          setShowDefeatModal(true)
+        }
       }
     }
   }
@@ -177,6 +201,18 @@ const NivelFacil = () => {
 
   return (
     <div className="relative flex min-h-screen w-full items-center justify-center bg-gradient-to-b from-sky-200 to-green-200 p-4 md:p-6 lg:p-8">
+      {/* Modal de Victoria */}
+      <VictoryModal 
+        isOpen={showVictoryModal} 
+        gameStats={gameStats} 
+      />
+      
+      {/* Modal de Derrota */}
+      <DefeatModal 
+        isOpen={showDefeatModal} 
+        gameStats={gameStats} 
+      />
+      
       <div className="relative w-full max-w-5xl mx-auto rounded-2xl bg-white/80 p-6 md:p-8 lg:p-12 shadow-xl backdrop-blur-md">
         {/* Barra de progreso */}
         <div className="mb-6">
