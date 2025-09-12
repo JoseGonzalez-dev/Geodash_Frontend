@@ -11,6 +11,7 @@
     import { useRegister } from '../../shared/hooks/Auth/useRegister'
     import { useUser } from '../../shared/hooks/User/useUser'
     import { StarsBackground } from '../molecules/StarsBackground'
+import { Link } from 'react-router-dom'
 
     export const Register = ({ switchAuthHandler }) => {
         const form = {
