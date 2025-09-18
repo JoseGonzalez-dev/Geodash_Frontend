@@ -64,27 +64,3 @@ export const validateAndCleanToken = () => {
   return true;
 };
 
-/**
- * Función para testing - simula un token expirado
- * Solo usar en desarrollo para probar el sistema
- */
-export const simulateExpiredToken = () => {
-  if (process.env.NODE_ENV === 'development') {
-    console.log('🧪 Simulando token expirado para testing...');
-    // Crear un token con expiración en el pasado
-    const expiredPayload = {
-      exp: Math.floor(Date.now() / 1000) - 3600, // Expiró hace 1 hora
-      iat: Math.floor(Date.now() / 1000) - 7200, // Creado hace 2 horas
-      sub: 'test-user'
-    };
-    
-    const header = btoa(JSON.stringify({ alg: 'HS256', typ: 'JWT' }));
-    const payload = btoa(JSON.stringify(expiredPayload));
-    const signature = 'fake-signature';
-    
-    const expiredToken = `${header}.${payload}.${signature}`;
-    localStorage.setItem('token', expiredToken);
-    
-    console.log('🧪 Token expirado simulado guardado en localStorage');
-  }
-};

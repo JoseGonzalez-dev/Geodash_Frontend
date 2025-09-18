@@ -13,7 +13,6 @@ export const useStreaks = () => {
         // Verificar token antes de hacer la petición
         const isTokenValid = validateAndCleanToken()
         if (!isTokenValid) {
-            console.log('🔑 Token inválido o expirado, no se puede obtener la racha')
             setError('Token expirado')
             setLoading(false)
             return false

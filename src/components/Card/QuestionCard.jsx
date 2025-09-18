@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react'
+import React, { useState, useEffect } from 'react'
 import { validarRespuesta } from '../../services/Questionsapi.js'
 import { useQuestionTimer } from '../../hooks/useQuestionTimer'
 import QuestionTimer from '../Timer/QuestionTimer'
@@ -10,7 +10,6 @@ const PreguntaCard = ({ pregunta, onAnswered, disabled = false }) => {
   const [esCorrecta, setEsCorrecta] = useState(false)
   const [cargando, setCargando] = useState(false)
   const [hasAnswered, setHasAnswered] = useState(false)
-  const isInitialized = useRef(false)
 
   // Timer de 20 segundos
   const handleTimeout = () => {
@@ -27,7 +26,7 @@ const PreguntaCard = ({ pregunta, onAnswered, disabled = false }) => {
     }
   }
 
-  const { timeLeft, progress, isActive, hasTimedOut, startTimer, stopTimer, resetTimer } = useQuestionTimer(20000, handleTimeout)
+  const { timeLeft, progress, isActive, hasTimedOut, startTimer, stopTimer } = useQuestionTimer(20000, handleTimeout)
 
   // Iniciar timer cuando se carga la pregunta
   useEffect(() => {

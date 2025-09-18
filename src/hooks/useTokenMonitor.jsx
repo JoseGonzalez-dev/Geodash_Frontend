@@ -1,5 +1,6 @@
 import { useEffect, useRef } from 'react'
 import { validateAndCleanToken } from '../utils/tokenUtils'
+import { toast } from 'sonner'
 
 /**
  * Hook para monitorear el token periódicamente
@@ -10,19 +11,14 @@ export const useTokenMonitor = (intervalMinutes = 5) => {
   const intervalRef = useRef(null)
 
   useEffect(() => {
-    // Verificar inmediatamente al montar
-    console.log('🔍 Verificando token inicial...')
     validateAndCleanToken()
 
     // Configurar verificación periódica
     const intervalMs = intervalMinutes * 60 * 1000
     intervalRef.current = setInterval(() => {
-      console.log('🔍 Verificación periódica del token...')
       const isValid = validateAndCleanToken()
       if (!isValid) {
-        console.log('⏰ Token expirado detectado en verificación periódica')
-        // Opcional: mostrar notificación al usuario
-        // toast.info('Tu sesión ha expirado. Por favor, inicia sesión nuevamente.')
+        toast.info('Tu sesión ha expirado. Por favor, inicia sesión nuevamente.')
       }
     }, intervalMs)
 
