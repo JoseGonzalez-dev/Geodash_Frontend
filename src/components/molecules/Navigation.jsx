@@ -1,5 +1,6 @@
 import React from 'react'
 import { useNavigate, useLocation } from 'react-router-dom'
+import { UserDropdown } from './UserDropdown'
 
 export const Navigation = () => {
   const navigate = useNavigate()
@@ -36,9 +37,8 @@ export const Navigation = () => {
         GeoDash
       </h1>
       
-      <div className="w-12 h-12 bg-gray-600 rounded-full flex items-center justify-center">
-        <span className="text-2xl">👤</span>
-      </div>
+      <UserDropdown />
+      
     </div>
   )
 }
