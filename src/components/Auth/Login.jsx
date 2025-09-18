@@ -45,9 +45,6 @@ export const Login = ({ switchAuthHandler }) => {
         login(formData.userLogin.value, formData.password.value);
     };
 
-    const crearCuenta = () => {
-        useNavigate("/register")
-    }
 
     return (
         <div className="flex items-center justify-center min-h-screen" >
@@ -93,7 +90,7 @@ export const Login = ({ switchAuthHandler }) => {
                             Login
                         </button>
                         <Link to="/register">
-                            <button className="w-full bg-blue-700 hover:bg-green-800 text-white font-bold py-2 px-4 mb-6 rounded" onClick={crearCuenta}>
+                            <button className="w-full bg-blue-700 hover:bg-green-800 text-white font-bold py-2 px-4 mb-6 rounded">
                                 Create Account
                             </button>
                         </Link>

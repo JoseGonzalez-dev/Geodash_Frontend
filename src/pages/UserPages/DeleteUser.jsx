@@ -10,7 +10,6 @@ export const DeleteUser = () => {
     e.preventDefault();
     deleteProfile();
     setShowModal(false);
-    setConfirmationText("");
   };
 
   return (

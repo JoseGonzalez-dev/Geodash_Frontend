@@ -219,9 +219,12 @@ import { Link } from 'react-router-dom'
                         >
                             Registrar
                         </button>
+                        <Link to="/login">
                         <button className="w-full bg-blue-800 hover:bg-green-800 text-white font-bold py-2 px-4 mb-6 rounded">
                             Iniciar Sesión
                         </button>
+                        </Link>
+                        
                     </form>
 
                         

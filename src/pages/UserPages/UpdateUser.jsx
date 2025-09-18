@@ -19,17 +19,18 @@ export const UpdateUserPage = () => {
       }
     }
     loadUserData()
-    setInitialData(userData)
   }, [])
 
   useEffect(() => {
+  if (userData) {
     setFormData({
-      name: userData?.name || '',
-      surname: userData?.surname || '',
-      email: userData?.email || '',
-      username: userData?.username || ''
+      name: userData.name || "",
+      surname: userData.surname || "",
+      email: userData.email || "",
+      username: userData.username || ""
     })
-  }, [userData])
+  }
+}, [userData])
 
   const [formData, setFormData] = useState({
     name: '',
@@ -63,6 +64,7 @@ export const UpdateUserPage = () => {
             name="email"
             value={formData.email}
             onChange={handleChange}
+
             className="w-full px-4 py-2 border rounded-md bg-gray-100"
           />
         </div>
@@ -112,6 +114,9 @@ export const UpdateUserPage = () => {
           </button>
           
 
+          
+          
+
           <Link to="/changePass">
             <button
               type="button"
@@ -121,6 +126,14 @@ export const UpdateUserPage = () => {
             </button>
           </Link>
           <DeleteUser className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded" />
+            <Link to="/game">
+                <button
+                  type="button"
+                  className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded"
+                >
+                  Regresar
+                </button>
+            </Link>
         </div>
 
       </form>

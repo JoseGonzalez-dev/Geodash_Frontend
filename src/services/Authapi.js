@@ -2,7 +2,7 @@ import axios from "axios";
 
 const apiClient=axios.create(
     {
-        baseURL:`${import.meta.env.VITE_API_BACKEND}/auth`,
+        baseURL:'http://localhost:6002/api/v1/geobash/',
         timeout:2000
     }
 )
@@ -43,7 +43,7 @@ apiClient.interceptors.response.use(
 
 export const loginRequest=async(user)=>{
     try{
-        return await apiClient.post('login',user)
+        return await apiClient.post('auth/login',user)
     }catch(e){
         return{
             error:true,
@@ -54,7 +54,7 @@ export const loginRequest=async(user)=>{
 
 export const registerRequest=async(user)=>{
     try{
-        return await apiClient.post('register',user)
+        return await apiClient.post('auth/register',user)
     }catch(e){
         return{
             error:true,
