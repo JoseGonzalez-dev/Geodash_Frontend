@@ -5,6 +5,7 @@ import earthDay from '../assets/textures/earth-day.jpg'
 import earthCloud from '../assets/textures/earth-clouds.jpg'
 import { StarsBackground } from '../components/molecules/StarsBackground'
 import { useNavigate, useLocation } from 'react-router-dom'
+import { useTokenMonitor } from '../hooks/useTokenMonitor'
 
 export const HomePage = () => {
   const mountRef = useRef(null)
@@ -15,6 +16,9 @@ export const HomePage = () => {
   const navigate = useNavigate()
   const location = useLocation()
   const [showUI, setShowUI] = useState(true)
+
+  // Monitorear token periódicamente (cada 2 minutos)
+  useTokenMonitor(2)
 
   useEffect(() => {
     if (!mountRef.current) return
@@ -64,7 +68,6 @@ export const HomePage = () => {
     // Manager de carga
     const manager = new THREE.LoadingManager()
     manager.onLoad = () => {
-      console.log('✅ Texturas cargadas. Creando objetos 3D...')
 
       // Materiales
       const earthMaterial = new THREE.MeshStandardMaterial({
@@ -107,7 +110,6 @@ export const HomePage = () => {
 
     // ✅ Función de zoom mejorada
     const startZoomAnimation = () => {
-      console.log('🚀 Iniciando animación de zoom...')
       // ✅ Reset completo del estado
       camera.position.set(0, 0, 3)
       isZooming = true
@@ -144,7 +146,6 @@ export const HomePage = () => {
         )
 
         if (progress >= 1) {
-          console.log('✅ Animación de zoom completada')
           isZooming = false
         }
       }
@@ -174,7 +175,6 @@ export const HomePage = () => {
 
     // Cleanup
     return () => {
-      console.log('🧹 Limpiando recursos Three.js...')
       
       window.removeEventListener('resize', handleResize)
       
@@ -217,7 +217,6 @@ export const HomePage = () => {
   }, [location.pathname]) // ✅ Re-ejecutar cuando cambia la ruta
 
   const handlePlayClick = () => {
-    console.log('🎮 Play button clicked!')
     setShowUI(false)
     
     // ✅ Usar función global con delay para asegurar que esté disponible
@@ -226,7 +225,6 @@ export const HomePage = () => {
         window.startZoomAnimation()
         setTimeout(() => navigate('/game'), 3500)
       } else {
-        console.error('❌ Función de zoom no disponible')
         // ✅ Fallback: navegar inmediatamente
         navigate('/game')
       }

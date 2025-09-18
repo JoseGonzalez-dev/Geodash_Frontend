@@ -2,19 +2,29 @@ import React, { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { AuthModal } from '../components/molecules/AuthModal'
 import { useStreaks } from '../hooks/useStreaks'
+import { useGameStats } from "../hooks/useGameStats"
+import { useTokenMonitor } from '../hooks/useTokenMonitor'
+import { useAuthState } from '../hooks/useAuthState'
 
 export const GameMode = () => {
     const navigate = useNavigate()
     const [isLoaded, setIsLoaded] = useState(false)
     const [showAuthModal, setShowAuthModal] = useState(false)
-    const [isAuthenticated, setIsAuthenticated] = useState(false) // Cambiar a false para probar auth
     const { loading, error, streak, fetchMyStreak } = useStreaks()
+    const { getTrophies } = useGameStats()
+    const [trophies, setTrophies] = useState({ explorer: '0/10', traveler: '0/10', geographer: '0/10' })
+    
+    // Monitorear token periódicamente (cada 2 minutos)
+    useTokenMonitor(2)
+    
+    // Estado de autenticación que se actualiza automáticamente
+    const { isAuthenticated } = useAuthState()
 
     const gameCards = [
         {
             id: 'explorer',
             title: '🔍 Explorador',
-            score: '0/10',
+            score: trophies.explorer,
             color: 'from-green-400 to-green-600',
             buttonColor: 'bg-green-200 hover:bg-green-600',
             delay: 'delay-200'
@@ -22,7 +32,7 @@ export const GameMode = () => {
         {
             id: 'traveler',
             title: '✈️ Viajero',
-            score: '0/10',
+            score: trophies.traveler,
             color: 'from-blue-400 to-blue-600',
             buttonColor: 'bg-yellow-200 hover:bg-yellow-600',
             delay: 'delay-400'
@@ -30,7 +40,7 @@ export const GameMode = () => {
         {
             id: 'geographer',
             title: '🏆 Geógrafo',
-            score: '0/10',
+            score: trophies.geographer,
             color: 'from-purple-400 to-purple-600',
             buttonColor: 'bg-red-400 hover:bg-red-600',
             delay: 'delay-600'
@@ -38,17 +48,12 @@ export const GameMode = () => {
     ]
 
     useEffect(() => {
-        // Verificar si el usuario está autenticado
-        const token = localStorage.getItem('token')
-        const user = localStorage.getItem('user')
-        if (token && user) {
-            setIsAuthenticated(true)
-        }
-
         // Activar animaciones después de un pequeño delay
         const timer = setTimeout(() => {
             setIsLoaded(true)
         }, 100)
+        // Cargar trofeos locales
+        setTrophies(getTrophies())
         return () => clearTimeout(timer)
     }, [])
 

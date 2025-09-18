@@ -1,4 +1,5 @@
 import axios from "axios"
+import { isTokenExpired, clearAuthData } from "../utils/tokenUtils"
 const API_URL = import.meta.env.VITE_API_BACKEND
 
 const apiClient = axios.create(
@@ -10,14 +11,15 @@ const apiClient = axios.create(
 
 apiClient.interceptors.request.use(
     (config)=>{
-        console.log('🔄 Petición HTTP:', {
-            method: config.method?.toUpperCase(),
-            url: config.baseURL + config.url,
-            data: config.data
-        })
         
         const token=localStorage.getItem('token')
         if(token){
+            // Verificar si el token ha expirado antes de enviar la petición
+            if(isTokenExpired(token)){
+                clearAuthData()
+                // No agregar el token expirado a la petición
+                return config
+            }
             config.headers.Authorization=`Bearer ${token}`
         }
         return config
@@ -26,25 +28,13 @@ apiClient.interceptors.request.use(
 
 apiClient.interceptors.response.use(
     (response) => {
-        console.log('✅ Respuesta exitosa:', {
-            status: response.status,
-            data: response.data
-        })
         return response
     },
     (error) => {
-        console.log('❌ Error en petición:', {
-            status: error.response?.status,
-            message: error.response?.data?.message || error.message,
-            data: error.response?.data
-        })
         
         // Si el token expiró (401 Unauthorized), limpiar localStorage y redirigir
         if (error.response?.status === 401) {
-            console.log('🔑 Token expirado, redirigiendo a login...')
-            localStorage.removeItem('token')
-            localStorage.removeItem('user') // por si guardas info del usuario
-            window.location.href = '/login'
+            clearAuthData()
         }
         
         return Promise.reject(error)
@@ -67,7 +57,6 @@ export const getMyStreak = async () => {
 export const createGame = async (data) => {
     try {
         const response = await apiClient.post('/game/', data)
-        console.log('✅ [API] createGame respuesta exitosa:', response);
         return response
         
     } catch (e) {
@@ -114,6 +103,20 @@ export const sendUserAnswers = async (data) => {
 export const sendGuestAnswer = async (data) => {
     try {
         const response = await apiClient.post('/user_Answer/guest', data)
+        return response
+    } catch (e) {
+        return {
+            error: true,
+            message: e.message,
+            e: e
+        }
+    }
+}
+
+//Profile
+export const getUserProfile = async () => {
+    try {
+        const response = await apiClient.get('/user/my-profile')
         return response
     } catch (e) {
         return {
