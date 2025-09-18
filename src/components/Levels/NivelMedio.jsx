@@ -21,7 +21,7 @@ const NivelMedio = () => {
   const { sendRequest: createGame, loading: creatingGame } = useGame()
   const { sendRequest: saveAnswer, loading: savingAnswer } = useUserAnswer()
   const { endGame } = useEndGame()
-  const { calculateStats } = useGameStats()
+  const { calculateStats, saveResult } = useGameStats()
   const navigate = useNavigate()
 
   useEffect(() => {
@@ -87,37 +87,37 @@ const NivelMedio = () => {
 
     const responseTime = startTime ? Date.now() - startTime : 0
     
-    const questionId = preguntas[currentIndex]._id || preguntas[currentIndex].id
-    if (!questionId) {
-      console.error('❌ [NivelMedio] No se encontró ID de la pregunta:', preguntas[currentIndex])
-      return
-    }
-    
-    const answerData = {
-      game: gameId,
-      question: questionId,
-      selectedOption: selectedOption,
-      responseTimeMs: responseTime
-    }
-    
-    const result = await saveAnswer(answerData)
-    
-    if (result && !result.error) {
-      console.log('✅ [NivelMedio] Respuesta guardada exitosamente:', result.data)
-    } else {
-      console.error('❌ [NivelMedio] Error guardando respuesta:', result)
-    }
+    // Solo guardar en el backend si no es timeout
+    if (selectedOption !== 'TIMEOUT') {
+      const questionId = preguntas[currentIndex]._id || preguntas[currentIndex].id
+      if (!questionId) {
+        console.error('❌ [NivelMedio] No se encontró ID de la pregunta:', preguntas[currentIndex])
+        return
+      }
+      
+      const answerData = {
+        game: gameId,
+        question: questionId,
+        selectedOption: selectedOption,
+        responseTimeMs: responseTime
+      }
+      
+      const result = await saveAnswer(answerData)
+      
+      if (result && !result.error) {
+        console.log('✅')
+      } else {
+        console.error('❌ [NivelMedio] Error guardando respuesta:', result)
+      }
+    } 
 
-    // Auto-avanzar después de 2 segundos
+    // Auto-avanzar después de 1.5 segundos
     setTimeout(() => {
       if (currentIndex < preguntas.length - 1) {
-        console.log('➡️ [NivelMedio] Avanzando a siguiente pregunta...')
         setCurrentIndex(currentIndex + 1)
         setStartTime(Date.now()) // Reiniciar timer para la siguiente pregunta
-      } else {
-        console.log('🎉 [NivelMedio] Juego completado!')
       }
-    }, 2000)
+    }, 1500)
 
     const newAnswer ={
       isCorrect,
@@ -142,7 +142,6 @@ const NivelMedio = () => {
       const result = await endGame(gameId, gameData)
 
       if(result.success){
-        console.log('🏆 [NivelMedio] Juego finalizado exitosamente:', result)
         
         // Determinar si el usuario ganó o perdió (70% de respuestas correctas para ganar)
         const passingScore = Math.ceil(preguntas.length * 0.7)
@@ -153,13 +152,20 @@ const NivelMedio = () => {
           score: stats.totalScore,
           correctAnswers: stats.correctAnswers,
           totalQuestions: preguntas.length,
-          timeBonus: Math.floor(stats.averageResponseTimeMs < 4000 ? 200 : 75),
-          streakBonus: Math.floor(stats.longestStreak * 30),
+          timeBonus: Math.floor(stats.averageResponseTime < 4000 ? 200 : 75),
+          streakBonus: 0,
           difficulty: 'Viajero',
           bestScore: stats.totalScore // Podríamos obtener el mejor puntaje del usuario en el futuro
         }
         
         setGameStats(modalStats)
+        // Guardar resultados locales para trofeos (Viajero)
+        saveResult('traveler', {
+          correctAnswers: stats.correctAnswers,
+          totalQuestions: preguntas.length,
+          totalScore: stats.totalScore,
+          averageResponseTime: stats.averageResponseTime
+        })
         
         // Mostrar el modal correspondiente
         if (didWin) {
@@ -168,13 +174,6 @@ const NivelMedio = () => {
           setShowDefeatModal(true)
         }
       }
-    }
-  }
-
-  const handleNext = () => {
-    if (currentIndex < preguntas.length - 1) {
-      setCurrentIndex(currentIndex + 1)
-      setStartTime(Date.now())
     }
   }
 
@@ -231,18 +230,7 @@ const NivelMedio = () => {
           disabled={savingAnswer}
         />
 
-        {/* Botón de siguiente (opcional) */}
-        <div className="mt-8 text-center">
-          <button
-            onClick={handleNext}
-            disabled={currentIndex >= preguntas.length - 1}
-            className="rounded-xl bg-blue-500 px-8 md:px-12 py-3 md:py-4 text-lg md:text-xl text-white font-bold shadow-lg hover:bg-blue-600 hover:scale-105 disabled:bg-gray-400 disabled:cursor-not-allowed disabled:hover:scale-100 transition-all duration-300"
-          >
-            {currentIndex >= preguntas.length - 1 ? '🎉 Completado' : '➡️ Siguiente'}
-          </button>
-        </div>
       </div>
-
     </div>
   )
 }

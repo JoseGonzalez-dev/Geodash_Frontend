@@ -7,6 +7,7 @@ import { useNavigate } from "react-router-dom";
 import { Link } from 'react-router-dom';
 
 export const Login = ({ switchAuthHandler }) => {
+    const naigate = useNavigate();
     const { login } = useLogin();
     const [formData, setFormData] = useState({
         userLogin: { value: '', isValid: false, showError: false },
@@ -46,7 +47,7 @@ export const Login = ({ switchAuthHandler }) => {
     };
 
     const crearCuenta = () => {
-        useNavigate("/register")
+        naigate("/register")
     }
 
     return (
