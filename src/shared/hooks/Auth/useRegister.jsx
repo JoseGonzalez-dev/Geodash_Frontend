@@ -11,7 +11,6 @@ export const useRegister=()=>{
 
     const register=async(user)=>{
         setIsLoading(true)
-        
         const response=await registerRequest(user)
         setIsLoading(false)
         
@@ -30,8 +29,8 @@ export const useRegister=()=>{
             )
         }
         setError(false)
-        toast.success('Registro exitoso')
-        navigate('/auth')
+        toast.success('Registro exitoso, ya puedes iniciar sesión')
+        navigate('/login')
     }
     return{
         register,

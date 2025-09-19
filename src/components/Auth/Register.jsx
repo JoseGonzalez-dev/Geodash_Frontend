@@ -50,22 +50,23 @@ import { Link } from 'react-router-dom'
         const [formData, setFormData] = useState(form)
         const { register } = useRegister()
         const isSubmitButtonDisable = !formData.email.isValid ||
+                                    !formData.name.isValid ||
                                     !formData.surname.isValid ||
                                     !formData.username.isValid ||
-                                    !formData.password.isValid 
-                                    !formData.confirmPassword.isValid 
+                                    !formData.password.isValid ||
+                                    !formData.confirmPassword.isValid
 
         const handleSubmit = (event) => {
         event.preventDefault()
         
-        const data = new FormData()
-        data.append('name', formData.name.value)
-        data.append('surname', formData.surname.value)
-        data.append('email', formData.email.value)
-        data.append('username', formData.username.value)
-        data.append('password', formData.password.value)
-        data.append('confirmPassword', formData.confirmPassword.value)
-        register(data)
+        const user = {
+            name: formData.name.value,
+            surname: formData.surname.value,
+            email: formData.email.value,
+            username: formData.username.value,
+            password: formData.password.value
+        }
+        register(user)
     }
 
 
