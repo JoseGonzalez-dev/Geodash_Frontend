@@ -10,10 +10,12 @@
         validateUsername} from '../../shared/validators/validators'
     import { useRegister } from '../../shared/hooks/Auth/useRegister'
     import { useUser } from '../../shared/hooks/User/useUser'
-    import { StarsBackground } from '../molecules/StarsBackground'
+import { StarsBackground } from '../molecules/StarsBackground'
 import { Link } from 'react-router-dom'
+import { Icon } from "@iconify/react"
 
     export const Register = ({ switchAuthHandler }) => {
+        const [showPassword, setShowPassword] = useState(false)
         const form = {
             name: {
                 value: '',
@@ -184,25 +186,37 @@ import { Link } from 'react-router-dom'
                                 
                             />
                         </div>
-                        <div>
+                        <div className="relative">
                             <label className="text-xl font-bold text-white text-center mb-10">Password</label>
                             <Input 
+                                type={showPassword ? "text" : "password"}
                                 field='password'
                                 onChangeHandler={handleValueChange}
                                 value={formData.password.value} 
-                                type='password'
                                 onBlurHandler={handleValidationOnBlur}
                                 showErrorMessage={formData.password.showError}
                                 validationMessage={passwordValidationMessage}
                             />
+                            <button
+                                type="button"
+                                onClick={() => setShowPassword(!showPassword)}
+                                className="absolute inset-y-11 right-0 flex items-center pr-4 text-gray-400 hover:text-white focus:outline-none transition-colors duration-200"
+                                aria-label={showPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'}
+                            >
+                                {showPassword ? (
+                                    <Icon icon="mdi:eye-off" width="20" height="20" />
+                                ) : (
+                                    <Icon icon="mdi:eye" width="20" height="20" />
+                                )}
+                            </button>
                         </div>
-                        <div>
+                        <div className="relative">
                             <label className="text-xl font-bold text-white text-center mb-10">Password Confirmation</label>
                             <Input 
                                 field='confirmPassword'
                                 onChangeHandler={handleValueChange}
                                 value={formData.confirmPassword.value} 
-                                type='password'
+                                type={showPassword ? "text" : "password"}
                                 onBlurHandler={handleValidationOnBlur}
                                 showErrorMessage={formData.confirmPassword.showError}
                                 validationMessage={passConfirmValidationMessage}
@@ -220,9 +234,11 @@ import { Link } from 'react-router-dom'
                         >
                             Registrar
                         </button>
-                        <button className="w-full bg-blue-800 hover:bg-green-800 text-white font-bold py-2 px-4 mb-6 rounded">
-                            Iniciar Sesión
-                        </button>
+                        <Link to="/login" className="w-full">
+                            <button type="button" className="w-full bg-blue-700 hover:bg-green-800 text-white font-bold py-2 px-4 mb-6 rounded">
+                                Iniciar Sesión
+                            </button>
+                        </Link>
                     </form>
 
                         

@@ -5,8 +5,10 @@ import { Input } from "../../components/Input.jsx"
 import { StarsBackground } from "../molecules/StarsBackground.jsx";
 import { useNavigate } from "react-router-dom";
 import { Link } from 'react-router-dom';
+import { Icon } from "@iconify/react"
 
 export const Login = ({ switchAuthHandler }) => {
+    const [showPassword, setShowPassword] = useState(false)
     const naigate = useNavigate();
     const { login } = useLogin();
     const [formData, setFormData] = useState({
@@ -71,14 +73,28 @@ export const Login = ({ switchAuthHandler }) => {
                         </div>
                         <div>
                             <label htmlFor="" className="text-xl font-bold text-white text-center mb-10">Password</label>
-                          <Input
-                            field="password"
-                            onChangeHandler={onValueChange}
-                            value={formData.password.value}
-                            type="password"
-                            onBlurHandler={handleValidationOnBlur}
-                            showErrorMessage={formData.password.showError}
-                        />  
+                            <div className="relative">
+                                <Input
+                                    type={showPassword ? "text" : "password"}
+                                    field="password"
+                                    onChangeHandler={onValueChange}
+                                    value={formData.password.value}
+                                    onBlurHandler={handleValidationOnBlur}
+                                    showErrorMessage={formData.password.showError}
+                                />
+                                <button
+                                    type="button"
+                                    onClick={() => setShowPassword(!showPassword)}
+                                    className="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-400 hover:text-white focus:outline-none transition-colors duration-200"
+                                    aria-label={showPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'}
+                                >
+                                    {showPassword ? (
+                                        <Icon icon="mdi:eye-off" width="20" height="20" />
+                                    ) : (
+                                        <Icon icon="mdi:eye" width="20" height="20" />
+                                    )}
+                                </button>
+                            </div>
                         </div>
                         
 
