@@ -9,6 +9,8 @@ import { Login } from "../components/Auth/Login"
 import { Register } from "../components/Auth/Register"
 import { UpdateUserPage } from "../pages/UserPages/UpdateUser"
 import { ChangePassword } from "../pages/UserPages/ChangePassword"
+import { ProfilePage } from "../pages/ProfilePage"
+import { NotFoundPage } from "../pages/NotFoundPage"
  
 const router = createBrowserRouter(
     [
@@ -43,7 +45,7 @@ const router = createBrowserRouter(
         },
         {
             path: '/*',
-            element: <div>404</div>
+            element: <NotFoundPage />
         },
         {
             path: "/login",
@@ -62,8 +64,17 @@ const router = createBrowserRouter(
         { 
             path:"/changePass",
             element: <ChangePassword />
+        },
+        {
+            path: "/profile",
+            element: <Layout />,
+            children: [
+                {
+                    index: true,
+                    element: <ProfilePage />
+                }
+            ]
         }
-
     ]
 )
  

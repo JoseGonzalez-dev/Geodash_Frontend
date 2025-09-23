@@ -1,4 +1,5 @@
 import axios from "axios";
+import { isTokenExpired, clearAuthData } from "../utils/tokenUtils";
 
 const apiClient = axios.create(
     {
@@ -11,9 +12,28 @@ apiClient.interceptors.request.use(
     (config) => {
         const token = localStorage.getItem('token')
         if (token) {
+            // Verificar si el token ha expirado antes de enviar la petición
+            if(isTokenExpired(token)){
+                clearAuthData()
+                // No agregar el token expirado a la petición
+                return config
+            }
             config.headers.Authorization = token
         }
         return config
+    }
+)
+
+apiClient.interceptors.response.use(
+    (response) => {
+        return response
+    },
+    (error) => {
+        // Si el token expiró (401 Unauthorized), limpiar localStorage y redirigir
+        if (error.response?.status === 401) {
+            clearAuthData()
+        }
+        return Promise.reject(error)
     }
 )
 

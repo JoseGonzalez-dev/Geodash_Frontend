@@ -5,6 +5,7 @@ import earthDay from '../assets/textures/earth-day.jpg'
 import earthCloud from '../assets/textures/earth-clouds.jpg'
 import { StarsBackground } from '../components/molecules/StarsBackground'
 import { useNavigate, useLocation } from 'react-router-dom'
+import { useTokenMonitor } from '../hooks/useTokenMonitor'
 
 export const HomePage = () => {
   const mountRef = useRef(null)
@@ -15,6 +16,9 @@ export const HomePage = () => {
   const navigate = useNavigate()
   const location = useLocation()
   const [showUI, setShowUI] = useState(true)
+
+  // Monitorear token periódicamente (cada 2 minutos)
+  useTokenMonitor(2)
 
   useEffect(() => {
     if (!mountRef.current) return
@@ -64,7 +68,6 @@ export const HomePage = () => {
     // Manager de carga
     const manager = new THREE.LoadingManager()
     manager.onLoad = () => {
-      console.log('✅ Texturas cargadas. Creando objetos 3D...')
 
       // Materiales
       const earthMaterial = new THREE.MeshStandardMaterial({
@@ -107,7 +110,6 @@ export const HomePage = () => {
 
     // ✅ Función de zoom mejorada
     const startZoomAnimation = () => {
-      console.log('🚀 Iniciando animación de zoom...')
       // ✅ Reset completo del estado
       camera.position.set(0, 0, 3)
       isZooming = true
@@ -144,7 +146,6 @@ export const HomePage = () => {
         )
 
         if (progress >= 1) {
-          console.log('✅ Animación de zoom completada')
           isZooming = false
         }
       }
@@ -174,7 +175,6 @@ export const HomePage = () => {
 
     // Cleanup
     return () => {
-      console.log('🧹 Limpiando recursos Three.js...')
       
       window.removeEventListener('resize', handleResize)
       
@@ -217,7 +217,6 @@ export const HomePage = () => {
   }, [location.pathname]) // ✅ Re-ejecutar cuando cambia la ruta
 
   const handlePlayClick = () => {
-    console.log('🎮 Play button clicked!')
     setShowUI(false)
     
     // ✅ Usar función global con delay para asegurar que esté disponible
@@ -226,7 +225,6 @@ export const HomePage = () => {
         window.startZoomAnimation()
         setTimeout(() => navigate('/game'), 3500)
       } else {
-        console.error('❌ Función de zoom no disponible')
         // ✅ Fallback: navegar inmediatamente
         navigate('/game')
       }
@@ -242,27 +240,27 @@ export const HomePage = () => {
 
       {showUI && (
         <>
-          <div className="absolute top-8 left-0 right-0 z-10 flex justify-center">
+          <div className="absolute top-4 sm:top-6 md:top-8 lg:top-10 xl:top-12 2xl:top-16 left-0 right-0 z-10 flex justify-center px-4">
             <h1
-              className="text-6xl font-bold bg-gradient-to-r from-blue-400 via-cyan-500 to-green-400 bg-clip-text text-transparent drop-shadow-lg"
+              className="text-3xl sm:text-4xl md:text-5xl lg:text-5xl xl:text-6xl 2xl:text-6xl font-bold bg-gradient-to-r from-blue-400 via-cyan-500 to-green-400 bg-clip-text text-transparent drop-shadow-lg text-center"
               style={{ fontFamily: 'Macondo, cursive' }}
             >
               GeoDash
             </h1>
           </div>
 
-          <div className="relative z-10 flex flex-col items-center justify-center h-full">
+          <div className="relative z-10 flex flex-col items-center justify-center h-full px-4 sm:px-6 lg:px-8">
             <p
-              className="text-2xl font-semibold text-cyan-400 bg-clip-text mb-8 drop-shadow-lg"
+              className="text-lg sm:text-xl md:text-2xl lg:text-2xl xl:text-3xl 2xl:text-3xl font-semibold text-cyan-400 bg-clip-text mb-6 sm:mb-8 lg:mb-10 xl:mb-12 2xl:mb-14 drop-shadow-lg text-center max-w-3xl"
               style={{ fontFamily: 'Macondo, cursive', textShadow: '0 0 5px #00BFFF' }}
             >
               ¿Conoces el planeta?
             </p>
-            <div className="relative group">
+            <div className="relative group w-full max-w-xs sm:max-w-sm md:max-w-md lg:max-w-lg xl:max-w-xl 2xl:max-w-2xl">
               <div className="absolute -inset-1 bg-gradient-to-r from-blue-400 via-cyan-500 to-green-400 rounded-lg blur opacity-75 group-hover:opacity-100 animate-pulse"></div>
               <div className="relative p-1 bg-gradient-to-r from-blue-400 via-cyan-500 to-green-400 rounded-lg">
                 <button
-                  className="relative bg-gray-900 hover:bg-gray-800 text-white px-8 py-4 rounded-lg text-2xl transition-all duration-300 hover:scale-95 shadow-lg w-full"
+                  className="relative bg-gray-900 hover:bg-gray-800 text-white px-6 sm:px-8 md:px-10 lg:px-12 xl:px-14 2xl:px-16 py-3 sm:py-4 md:py-4 lg:py-5 xl:py-6 2xl:py-6 rounded-lg text-lg sm:text-xl md:text-xl lg:text-2xl xl:text-2xl 2xl:text-3xl transition-all duration-300 hover:scale-95 shadow-lg w-full font-semibold"
                   onClick={handlePlayClick}
                 >
                   Jugar

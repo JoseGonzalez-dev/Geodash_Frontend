@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react"
 import { toast } from "sonner"
 import { getMyStreak } from "../services/api"
+import { validateAndCleanToken } from "../utils/tokenUtils"
 
 export const useStreaks = () => {
     const [loading, setLoading] = useState(false)
@@ -9,6 +10,14 @@ export const useStreaks = () => {
     const [streak, setStreak] = useState([])
 
     const fetchMyStreak = async() => {
+        // Verificar token antes de hacer la petición
+        const isTokenValid = validateAndCleanToken()
+        if (!isTokenValid) {
+            setError('Token expirado')
+            setLoading(false)
+            return false
+        }
+
         setLoading(true)
         setError(null)
         try {

@@ -39,21 +39,46 @@ export const VictoryModal = ({ isOpen, gameStats = {} }) => {
 
   return (
     <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-      {/* Confetti particles */}
+      {/* Confetti particles mejorado */}
       {showConfetti && (
         <div className="absolute inset-0 pointer-events-none overflow-hidden">
-          {[...Array(20)].map((_, i) => (
+          {/* Confetti de diferentes formas y tamaños */}
+          {[...Array(50)].map((_, i) => (
             <div
               key={i}
-              className={`absolute w-3 h-3 opacity-90 animate-bounce`}
+              className={`absolute opacity-90`}
               style={{
                 left: `${Math.random() * 100}%`,
                 top: `${Math.random() * 100}%`,
-                backgroundColor: ['#FFD700', '#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4'][Math.floor(Math.random() * 5)],
-                animationDelay: `${Math.random() * 2}s`,
-                animationDuration: `${2 + Math.random() * 2}s`
+                backgroundColor: ['#FFD700', '#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4', '#FF9F43', '#A55EEA', '#26de81'][Math.floor(Math.random() * 8)],
+                width: `${Math.random() * 8 + 4}px`,
+                height: `${Math.random() * 8 + 4}px`,
+                borderRadius: Math.random() > 0.5 ? '50%' : '20%',
+                animationDelay: `${Math.random() * 3}s`,
+                animationDuration: `${3 + Math.random() * 4}s`,
+                animationName: 'confettiFall',
+                animationTimingFunction: 'cubic-bezier(0.25, 0.46, 0.45, 0.94)',
+                transform: `rotate(${Math.random() * 360}deg)`
               }}
             />
+          ))}
+          {/* Estrellas brillantes */}
+          {[...Array(15)].map((_, i) => (
+            <div
+              key={`star-${i}`}
+              className="absolute text-2xl opacity-80"
+              style={{
+                left: `${Math.random() * 100}%`,
+                top: `${Math.random() * 100}%`,
+                color: ['#FFD700', '#FF6B6B', '#4ECDC4', '#45B7D1'][Math.floor(Math.random() * 4)],
+                animationDelay: `${Math.random() * 2}s`,
+                animationDuration: `${2 + Math.random() * 3}s`,
+                animationName: 'starTwinkle',
+                animationIterationCount: 'infinite'
+              }}
+            >
+              ✨
+            </div>
           ))}
         </div>
       )}

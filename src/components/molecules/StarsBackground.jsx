@@ -1,4 +1,4 @@
-import { useCallback } from "react"
+import { useCallback, useMemo } from "react"
 import Particles from "react-tsparticles"
 import { loadSlim } from "tsparticles-slim"
 
@@ -13,15 +13,22 @@ export const StarsBackground = ({ mode = "space" }) => {
         }
     }, [])
 
-    // Configuraciones según el modo
-    const getConfig = () => {
+    // Configuraciones según el modo - memoizado para evitar re-renders
+    const config = useMemo(() => {
         const baseConfig = {
-            fpsLimit: 120,
+            fpsLimit: 60,
             interactivity: {
                 events: {
                     onClick: { enable: false },
                     onHover: { enable: false },
                     resize: true,
+                },
+                modes: {
+                    push: { enable: false },
+                    remove: { enable: false },
+                    bubble: { enable: false },
+                    repulse: { enable: false },
+                    grab: { enable: false },
                 },
             },
             particles: {
@@ -30,13 +37,15 @@ export const StarsBackground = ({ mode = "space" }) => {
                 move: {
                     direction: "none",
                     enable: true,
-                    outModes: { default: "bounce" },
+                    outModes: { default: "out" },
                     random: true,
                     straight: false,
                 },
                 shape: { type: "circle" },
             },
             detectRetina: true,
+            pauseOnBlur: true,
+            pauseOnOutsideViewport: true,
         }
 
         if (mode === "space") {
@@ -118,16 +127,16 @@ export const StarsBackground = ({ mode = "space" }) => {
                 },
             }
         }
-    }
+    }, [mode])
 
     return (
         <>
             <Particles
                 id={`tsparticles-${mode}`}
-                key={`stars-${mode}-${Date.now()}`}
+                key={`stars-${mode}`}
                 init={particlesInit}
                 loaded={particlesLoaded}
-                options={getConfig()}
+                options={config}
                 style={{
                     position: "absolute",
                     top: 0,

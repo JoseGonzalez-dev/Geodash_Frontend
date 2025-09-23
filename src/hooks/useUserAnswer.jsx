@@ -33,7 +33,6 @@ export const useUserAnswer = () => {
             }
 
             if (response.data?.success) {
-                console.log('🎉 [useUserAnswer] Respuesta guardada exitosamente:', response.data)
                 return response.data
             }
 

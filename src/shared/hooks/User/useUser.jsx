@@ -13,7 +13,6 @@ export const useUser=()=>{
     const updateUser = async(id,data)=>{
         setIsLoading(true)
         const response = await updateUserRequest(id,data)
-        console.log(response.e);
         
         
         if(response.error){
@@ -77,7 +76,6 @@ export const useUser=()=>{
         setIsLoading(true)
         let user = JSON.parse(localStorage.getItem('user'))
         const response = await deleteProfileRequest(user.uid)
-        console.log(response.e);
         if(response.error){
             return toast.error(
                 response?.e?.response?.data?.message||

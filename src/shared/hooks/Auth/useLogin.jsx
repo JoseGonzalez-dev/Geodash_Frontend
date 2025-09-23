@@ -1,7 +1,7 @@
 import { useState } from "react"
 import { useNavigate } from "react-router-dom"
 import { loginRequest } from "../../../services/Authapi.js"
-import toast from "react-hot-toast"
+import { toast} from 'sonner'
 
 
 export const useLogin=()=>{
@@ -14,12 +14,8 @@ export const useLogin=()=>{
             userLogin,
             password
         }
-
-        console.log('🚀 Iniciando petición de login:', user)
-        console.log('📡 URL de la API:', `${import.meta.env.VITE_API_BACKEND}/auth/login`)
         
         const response=await loginRequest(user)
-        console.log('📥 Respuesta del login:', response)
         setIsLoading(false)
         
         

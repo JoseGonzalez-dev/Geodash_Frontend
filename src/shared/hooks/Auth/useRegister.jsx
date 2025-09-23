@@ -1,6 +1,6 @@
 import { useState } from "react"
 import { registerRequest } from "../../../services/Authapi.js"
-import toast from "react-hot-toast"
+import { toast} from 'sonner'
 import { useNavigate } from "react-router-dom"
 
 
@@ -11,14 +11,8 @@ export const useRegister=()=>{
 
     const register=async(user)=>{
         setIsLoading(true)
-        
-        console.log('🚀 Iniciando petición de registro:', user)
-        console.log('📡 URL de la API:', `${import.meta.env.VITE_API_BACKEND}/auth/register`)
-        
         const response=await registerRequest(user)
-        console.log('📥 Respuesta del registro:', response)
         setIsLoading(false)
-        console.log(response.e);
         
         if(response.error){
             setError(true)
@@ -35,8 +29,8 @@ export const useRegister=()=>{
             )
         }
         setError(false)
-        toast.success('Registro exitoso')
-        navigate('/auth')
+        toast.success('Registro exitoso, ya puedes iniciar sesión')
+        navigate('/login')
     }
     return{
         register,
