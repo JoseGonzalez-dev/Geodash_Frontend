@@ -10,6 +10,7 @@ const PreguntaCard = ({ pregunta, onAnswered, disabled = false }) => {
   const [esCorrecta, setEsCorrecta] = useState(false)
   const [cargando, setCargando] = useState(false)
   const [hasAnswered, setHasAnswered] = useState(false)
+  const [opcionesDesordenadas, setOpcionesDesordenadas] = useState([])
 
   // Timer de 20 segundos
   const handleTimeout = () => {
@@ -18,7 +19,7 @@ const PreguntaCard = ({ pregunta, onAnswered, disabled = false }) => {
       setEsCorrecta(false)
       setMostrarResultados(true)
       setHasAnswered(true)
-      
+
       if (onAnswered) {
         // Para timeout, usar una opción especial que indique "sin respuesta"
         onAnswered(false, 'TIMEOUT')
@@ -28,6 +29,25 @@ const PreguntaCard = ({ pregunta, onAnswered, disabled = false }) => {
 
   const { timeLeft, progress, isActive, hasTimedOut, startTimer, stopTimer } = useQuestionTimer(20000, handleTimeout)
 
+  // Función para desordenar array usando Fisher-Yates shuffle
+  const shuffleArray = (array) => {
+    const shuffled = [...array]
+    for (let i = shuffled.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]]
+    }
+    return shuffled
+  }
+
+  // Desordenar opciones cuando llega una nueva pregunta
+  useEffect(() => {
+    if (pregunta && (pregunta.texto_respuestas || pregunta.opciones)) {
+      const opciones = pregunta.texto_respuestas || pregunta.opciones || []
+      const opcionesConTexto = opciones.map(op => typeof op === 'string' ? op : (op.texto || op))
+      setOpcionesDesordenadas(shuffleArray(opcionesConTexto))
+    }
+  }, [pregunta?.id])
+
   // Iniciar timer cuando se carga la pregunta
   useEffect(() => {
     if (pregunta && !disabled) {
@@ -35,7 +55,7 @@ const PreguntaCard = ({ pregunta, onAnswered, disabled = false }) => {
       const rafId = requestAnimationFrame(() => {
         startTimer()
       })
-      
+
       return () => {
         cancelAnimationFrame(rafId)
         stopTimer()
@@ -46,7 +66,7 @@ const PreguntaCard = ({ pregunta, onAnswered, disabled = false }) => {
   const findCorrectAnswer = async () => {
     // Estrategia: probar todas las opciones hasta encontrar la correcta
     const opciones = pregunta.texto_respuestas || pregunta.opciones || []
-    
+
     for (const op of opciones) {
       const opcionTexto = typeof op === 'string' ? op : (op.texto || op)
       try {
@@ -67,7 +87,7 @@ const PreguntaCard = ({ pregunta, onAnswered, disabled = false }) => {
     setSeleccion(opcionTexto)
     setCargando(true)
     setHasAnswered(true)
-    
+
     // Detener el timer cuando se responde
     stopTimer()
 
@@ -182,48 +202,44 @@ const PreguntaCard = ({ pregunta, onAnswered, disabled = false }) => {
     }
   }
 
-  // Obtener las opciones de respuesta
-  const opciones = pregunta.texto_respuestas || pregunta.opciones || []
-
   return (
-    <div className="w-full max-w-4xl mx-auto">
+    <div className="w-full max-w-4xl xl:max-w-5xl 2xl:max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
       {/* Timer */}
-      <QuestionTimer 
+      <QuestionTimer
         timeLeft={timeLeft}
         progress={progress}
         isActive={isActive}
         hasTimedOut={hasTimedOut}
       />
-      
+
       {/* Pregunta */}
-      <h3 className="text-xl md:text-2xl lg:text-3xl font-bold text-center mb-8 text-gray-800 leading-relaxed px-4">
+      <h3 className="text-lg sm:text-xl md:text-2xl lg:text-2xl xl:text-3xl 2xl:text-3xl font-bold text-center mb-6 sm:mb-8 lg:mb-8 xl:mb-10 2xl:mb-10 text-gray-800 leading-relaxed">
         {pregunta.texto}
       </h3>
-      
+
       {/* Opciones - Grid responsive */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6 mb-6">
-        {opciones.map((op, i) => {
-          const opcionTexto = typeof op === 'string' ? op : (op.texto || op)
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4 md:gap-5 lg:gap-6 xl:gap-7 2xl:gap-8 mb-6">
+        {opcionesDesordenadas.map((opcionTexto, i) => {
           return (
             <button
-              key={i}
+              key={`${pregunta?.id}-${i}`}
               style={getButtonStyle(opcionTexto)}
-              className="p-4 md:p-6 lg:p-8 rounded-xl text-base md:text-lg lg:text-xl font-bold transition-all duration-300 hover:scale-105 active:scale-95 shadow-lg"
+              className="p-3 sm:p-4 md:p-5 lg:p-6 xl:p-7 2xl:p-8 rounded-lg sm:rounded-xl text-sm sm:text-base md:text-base lg:text-lg xl:text-xl 2xl:text-xl font-bold transition-all duration-300 hover:scale-105 active:scale-95 shadow-lg"
               onClick={() => handleSeleccion(opcionTexto)}
               disabled={mostrarResultados || cargando || disabled || hasAnswered || hasTimedOut}
             >
-              <span className="flex items-center justify-center gap-2">
-                {cargando && opcionTexto === seleccion && <span className="text-xl animate-spin">⏳</span>}
-                {mostrarResultados && esCorrecta && opcionTexto === seleccion && <span className="text-xl animate-bounce">✅</span>}
-                {mostrarResultados && opcionTexto === seleccion && !esCorrecta && <span className="text-xl animate-pulse">❌</span>}
-                <span className="text-center">{opcionTexto}</span>
+              <span className="flex items-center justify-center gap-2 sm:gap-3">
+                {cargando && opcionTexto === seleccion && <span className="text-lg sm:text-xl animate-spin">⏳</span>}
+                {mostrarResultados && esCorrecta && opcionTexto === seleccion && <span className="text-lg sm:text-xl animate-bounce">✅</span>}
+                {mostrarResultados && opcionTexto === seleccion && !esCorrecta && <span className="text-lg sm:text-xl animate-pulse">❌</span>}
+                <span className="text-center leading-tight">{opcionTexto}</span>
               </span>
             </button>
           )
         })}
       </div>
 
-      
+
     </div>
   )
 }
